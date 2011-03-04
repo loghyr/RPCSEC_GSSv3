@@ -213,15 +213,6 @@
       </list>
     </t>
   </section>
-
-  <section anchor="ss:cuitd" title="Conventions used in this document">
-
-    <t>
-      The key words "MUST", "MUST NOT", "REQUIRED", "SHALL", "SHALL NOT",
-      "SHOULD", "SHOULD NOT", "RECOMMENDED", "MAY", and "OPTIONAL" in this
-      document are to be interpreted as described in <xref target="RFC2119" />.
-    </t>
-  </section>
 </section>
 
 <section anchor="sec:protocol" title="The RPCSEC_GSSv3 protocol">
