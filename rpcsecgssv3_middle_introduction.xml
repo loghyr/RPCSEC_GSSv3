@@ -116,7 +116,7 @@
       <list style="letters">
         <t>
           application-level protocol extensions, such as new operations for
-          the Network File System version 4 (NFSv4) protocol <xref target="RFC3530" />;
+          the Network File System version 4 (NFSv4) protocol <xref target="RFC3530bis" />;
         </t>
 
         <t>
