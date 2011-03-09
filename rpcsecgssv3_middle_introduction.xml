@@ -259,18 +259,91 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <figure>
     <artwork>
       ///  /*
-      ///   * Copyright (C) The IETF Trust (2011)
-      ///   * All Rights Reserved.
+      ///   * Copyright (c) 2011 IETF Trust and the persons
+      ///   * identified as the document authors. All rights
+      ///   * reserved.
+      ///   *
+      ///   * The document authors are identified in [RFC2203], 
+      ///   * [RFC5403], and [RFCxxxx].
+      ///   *
+      ///   * Redistribution and use in source and binary forms,
+      ///   * with or without modification, are permitted
+      ///   * provided that the following conditions are met:
+      ///   *
+      ///   * o Redistributions of source code must retain the above
+      ///   *   copyright notice, this list of conditions and the
+      ///   *   following disclaimer.
+      ///   *
+      ///   * o Redistributions in binary form must reproduce the
+      ///   *   above copyright notice, this list of
+      ///   *   conditions and the following disclaimer in
+      ///   *   the documentation and/or other materials
+      ///   *   provided with the distribution.
+      ///   *
+      ///   * o Neither the name of Internet Society, IETF or IETF
+      ///   *   Trust, nor the names of specific contributors, may be
+      ///   *   used to endorse or promote products derived from this
+      ///   *   software without specific prior written permission.
+      ///   *
+      ///   *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+      ///   *   AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+      ///   *   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+      ///   *   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+      ///   *   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+      ///   *   EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+      ///   *   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+      ///   *   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+      ///   *   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+      ///   *   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+      ///   *   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+      ///   *   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+      ///   *   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+      ///   *   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+      ///   *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
       ///   */
+      ///
       ///  /*
-      ///   * Copyright (C) The Internet Society (2011)
-      ///   * All Rights Reserved.
+      ///   * This code was derived from [RFC2203]. Please
+      ///   * reproduce this note if possible.
       ///   */
       ///
       ///  /*
       ///   * rpcsec_gss_v3.x
       ///   */
-      ///  #define RPCSEC_GSS_VERS_3 3
+      ///
+      ///  enum rpc_gss_service_t {
+      ///          /* Note: the enumerated value for 0 is reserved. */
+      ///          rpc_gss_svc_none         = 1,
+      ///          rpc_gss_svc_integrity    = 2,
+      ///          rpc_gss_svc_privacy      = 3,
+      ///          rpc_gss_svc_channel_prot = 4
+      ///  };
+      ///
+      ///   enum rpc_gss_proc_t {
+      ///           RPCSEC_GSS_DATA          = 0,
+      ///           RPCSEC_GSS_INIT          = 1,
+      ///           RPCSEC_GSS_CONTINUE_INIT = 2,
+      ///           RPCSEC_GSS_DESTROY       = 3,
+      ///           RPCSEC_GSS_BIND_CHANNEL  = 4
+      ///  };
+      ///
+      ///  struct rpc_gss_cred_vers_1_t {
+      ///          rpc_gss_proc_t    gss_proc; /* control procedure */
+      ///          unsigned int      seq_num;  /* sequence number */
+      ///          rpc_gss_service_t service;  /* service used */
+      ///          opaque            handle<>; /* context handle */
+      ///  };
+      ///
+      ///  const RPCSEC_GSS_VERS_1 = 1;
+      ///  const RPCSEC_GSS_VERS_2 = 2;
+      ///  const RPCSEC_GSS_VERS_3 = 3; /* new */
+      ///
+      ///  union rpc_gss_cred_t switch (unsigned int rgc_version) {
+      ///  case RPCSEC_GSS_VERS_1:
+      ///  case RPCSEC_GSS_VERS_2:
+      ///  case RPCSEC_GSS_VERS_3: /* new */
+      ///          rpc_gss_cred_vers_1_t rgc_cred_v1;
+      ///  };
       ///
       ///  enum rpc_gss3_proc_t {
       ///          RPCSEC_GSS3_DATA = 0,
@@ -594,7 +667,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       <section anchor="ss:cb" title="Channel binding">
 
         <t>
-          RPCSEC_GSSv3 provides a different way to do channel binding that
+          RPCSEC_GSSv3 provides a different way to do channel binding than
           RPCSEC_GSSv2.  Specifically:
 
           <list style="letters">
@@ -742,7 +815,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           privilege names, as well as up to one privilege group name and zero
           or more exclusions, where each exclusion is a privilege name or
           privilege group name prefixed with an exclamation point.  Two special
-          privilege group names are defined hereing: "all" (which represents
+          privilege group names are defined here: "all" (which represents
           all possible privileges) and "basic" (which represents privileges
           normally granted to all users).
         </t>
@@ -760,9 +833,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           Identity assertions can be used either to modify the set of groups
           assigned on the server-side to a given user (authenticated by the
-          GSS-API) or to implement an AUTH_SYS-like <xref target="RFC1831" />.  In the latter
-          case the client specifies at least a user-name and possibly groups
-          that it thinks the user belongs to.
+          GSS-API) or to implement an AUTH_SYS-like <xref target="RFC1831" />.
+          In the latter case the client specifies at least a user-name and
+          possibly groups that it thinks the user belongs to.
         </t>
 
         <t>
