@@ -258,201 +258,206 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
   <figure>
     <artwork>
-      ///  /*
-      ///   * Copyright (c) 2011 IETF Trust and the persons
-      ///   * identified as the document authors. All rights
-      ///   * reserved.
-      ///   *
-      ///   * The document authors are identified in [RFC2203], 
-      ///   * [RFC5403], and [RFCxxxx].
-      ///   *
-      ///   * Redistribution and use in source and binary forms,
-      ///   * with or without modification, are permitted
-      ///   * provided that the following conditions are met:
-      ///   *
-      ///   * o Redistributions of source code must retain the above
-      ///   *   copyright notice, this list of conditions and the
-      ///   *   following disclaimer.
-      ///   *
-      ///   * o Redistributions in binary form must reproduce the
-      ///   *   above copyright notice, this list of
-      ///   *   conditions and the following disclaimer in
-      ///   *   the documentation and/or other materials
-      ///   *   provided with the distribution.
-      ///   *
-      ///   * o Neither the name of Internet Society, IETF or IETF
-      ///   *   Trust, nor the names of specific contributors, may be
-      ///   *   used to endorse or promote products derived from this
-      ///   *   software without specific prior written permission.
-      ///   *
-      ///   *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
-      ///   *   AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
-      ///   *   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
-      ///   *   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
-      ///   *   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
-      ///   *   EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
-      ///   *   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
-      ///   *   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
-      ///   *   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
-      ///   *   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
-      ///   *   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
-      ///   *   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
-      ///   *   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
-      ///   *   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
-      ///   *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
-      ///   */
-      ///
-      ///  /*
-      ///   * This code was derived from [RFC2203]. Please
-      ///   * reproduce this note if possible.
-      ///   */
-      ///
-      ///  /*
-      ///   * rpcsec_gss_v3.x
-      ///   */
-      ///
-      ///  enum rpc_gss_service_t {
-      ///          /* Note: the enumerated value for 0 is reserved. */
-      ///          rpc_gss_svc_none         = 1,
-      ///          rpc_gss_svc_integrity    = 2,
-      ///          rpc_gss_svc_privacy      = 3,
-      ///          rpc_gss_svc_channel_prot = 4
-      ///  };
-      ///
-      ///   enum rpc_gss_proc_t {
-      ///           RPCSEC_GSS_DATA          = 0,
-      ///           RPCSEC_GSS_INIT          = 1,
-      ///           RPCSEC_GSS_CONTINUE_INIT = 2,
-      ///           RPCSEC_GSS_DESTROY       = 3,
-      ///           RPCSEC_GSS_BIND_CHANNEL  = 4
-      ///  };
-      ///
-      ///  struct rpc_gss_cred_vers_1_t {
-      ///          rpc_gss_proc_t    gss_proc; /* control procedure */
-      ///          unsigned int      seq_num;  /* sequence number */
-      ///          rpc_gss_service_t service;  /* service used */
-      ///          opaque            handle<>; /* context handle */
-      ///  };
-      ///
-      ///  const RPCSEC_GSS_VERS_1 = 1;
-      ///  const RPCSEC_GSS_VERS_2 = 2;
-      ///  const RPCSEC_GSS_VERS_3 = 3; /* new */
-      ///
-      ///  union rpc_gss_cred_t switch (unsigned int rgc_version) {
-      ///  case RPCSEC_GSS_VERS_1:
-      ///  case RPCSEC_GSS_VERS_2:
-      ///  case RPCSEC_GSS_VERS_3: /* new */
-      ///          rpc_gss_cred_vers_1_t rgc_cred_v1;
-      ///  };
-      ///
-      ///  const MAXSEQ = 0x80000000;
-      ///
-      ///  enum rpc_gss3_proc_t {
-      ///          RPCSEC_GSS3_DATA = 0,
-      ///          RPCSEC_GSS3_LIST = 1,
-      ///          RPCSEC_GSS3_CREATE = 2,
-      ///          RPCSEC_GSS3_DESTROY = 3
-      ///  };
-      ///
-      ///  struct {
-      ///          rpc_gss3_proc_t         gss_proc;
-      ///          unsigned int            seq_num;
-      ///          rpc_gss_service_t       service;
-      ///          unsigned int            handle_version;
-      ///          opaque                  handle<>;
-      ///  } rpc_gss_cred_vers_3_t;
-      ///
-      ///  struct {
-      ///          int     type;
-      ///          bool    critical;
-      ///          opaque  data<>;
-      ///  } rpc_gss3_extension;
-      ///
-      ///  struct {
-      ///          unsigned int    version;
-      ///          opaque          handle<>;
-      ///          opaque          nonce<>;
-      ///          opaque          mic<>;
-      ///  } rpc_gss3_gss_binding;
-      ///
-      ///  typedef opaque rpc_gss3_chan_binding<>;
-      ///
-      ///  typedef opaque rpc_gss3_doi<>;
-      ///  struct {
-      ///          rpc_gss3_doi    doi;
-      ///          opaque          label<>;
-      ///  } rpc_gss3_label;
-      ///
-      ///  typedef opaque rpc_gss3_privs<>;
-      ///
-      ///  typedef opaque rpc_gss3_name<>;
-      ///
-      ///  struct {
-      ///          rpc_gss3_name   *username;
-      ///          rpc_gss3_name   *groups<>;
-      ///          rpc_gss3_name   *groups_add<>;
-      ///          rpc_gss3_name   *groups_remove<>;
-      ///  } rpc_gss3_id;
-      ///
-      ///  enum rpc_gss3_assertion_type {
-      ///          LABEL = 0,
-      ///          PRIVS = 1,
-      ///          IDENTITY = 2
-      ///  };
-      ///
-      ///  union switch (rpc_gss3_assertion_type atype) {
-      ///  case LABEL:
-      ///          rpc_gss3_label  label;
-      ///  case PRIVILEGES:
-      ///          rpc_gss3_privs  privs;
-      ///  case IDENTITY:
-      ///          rpc_gss3_id     id;
-      ///  default:
-      ///          opaque          ext<>;
-      ///  } rpc_gss3_assertion_u;
-      ///
-      ///  struct rpc_gss3_assertion {
-      ///          bool                    critical;
-      ///          rpc_gss3_assertion_u    assertion;
-      ///  };
-      ///
-      ///  struct {
-      ///          rpc_gss3_gss_binding    *compound_binding;
-      ///          rpc_gss3_chan_binding   *chan_binding_mic;
-      ///          rpc_gss3_assertion      assertions<>;
-      ///          rpc_gss3_extension      extensions<>;
-      ///  } rpc_gss3_create_args;
-      ///
-      ///  struct {
-      ///          opaque                  handle<>;
-      ///          rpc_gss3_chan_binding   *chan_binding_mic;
-      ///          rpc_gss3_assertion      granted_assertions<>;
-      ///          rpc_gss3_assertion      server_assertions<>;
-      ///          rpc_gss3_extension      extensions<>;
-      ///  } rpc_gss3_create_res;
-      ///
-      ///  enum rpc_gss3_list_item {
-      ///          DOI = 0,
-      ///          PRIV = 1,
-      ///          PRIV_GROUP = 2
-      ///  };
-      ///
-      ///  struct {
-      ///          rpc_gss3_list_item      list_what<>;
-      ///  } rpc_gss3_list_args;
-      ///
-      ///  union switch (rpc_gss3_list_item itype) {
-      ///  case DOI:
-      ///          rpc_gss3_doi    dois<>;
-      ///  case PRIV:
-      ///          string          privs;
-      ///  case PRIV_GROUP:
-      ///          string          priv_groups;
-      ///  default:
-      ///          opaque          ext<>;
-      ///  } rpc_gss3_list_item_u;
-      ///
-      ///  typedef rpc_gss3_list_item_u rpc_gss3_list_res<>;
+   ///  /*
+   ///   * Copyright (c) 2011 IETF Trust and the persons
+   ///   * identified as the document authors. All rights
+   ///   * reserved.
+   ///   *
+   ///   * The document authors are identified in [RFC2203], 
+   ///   * [RFC5403], and [RFCxxxx].
+   ///   *
+   ///   * Redistribution and use in source and binary forms,
+   ///   * with or without modification, are permitted
+   ///   * provided that the following conditions are met:
+   ///   *
+   ///   * o Redistributions of source code must retain the above
+   ///   *   copyright notice, this list of conditions and the
+   ///   *   following disclaimer.
+   ///   *
+   ///   * o Redistributions in binary form must reproduce the
+   ///   *   above copyright notice, this list of
+   ///   *   conditions and the following disclaimer in
+   ///   *   the documentation and/or other materials
+   ///   *   provided with the distribution.
+   ///   *
+   ///   * o Neither the name of Internet Society, IETF or IETF
+   ///   *   Trust, nor the names of specific contributors, may be
+   ///   *   used to endorse or promote products derived from this
+   ///   *   software without specific prior written permission.
+   ///   *
+   ///   *   THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS
+   ///   *   AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED
+   ///   *   WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+   ///   *   IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS
+   ///   *   FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO
+   ///   *   EVENT SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE
+   ///   *   LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
+   ///   *   EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT
+   ///   *   NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+   ///   *   SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+   ///   *   INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
+   ///   *   LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+   ///   *   OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING
+   ///   *   IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
+   ///   *   ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+   ///   */
+   ///
+   ///  /*
+   ///   * This code was derived from [RFC2203]. Please
+   ///   * reproduce this note if possible.
+   ///   */
+   ///
+   ///  /*
+   ///   * rpcsec_gss_v3.x
+   ///   */
+   ///
+   ///  enum rpc_gss_service_t {
+   ///          /* Note: the enumerated value for 0 is reserved. */
+   ///          rpc_gss_svc_none         = 1,
+   ///          rpc_gss_svc_integrity    = 2,
+   ///          rpc_gss_svc_privacy      = 3,
+   ///          rpc_gss_svc_channel_prot = 4
+   ///  };
+   ///
+   ///  enum rpc_gss_proc_t {
+   ///           RPCSEC_GSS_DATA          = 0,
+   ///           RPCSEC_GSS_INIT          = 1,
+   ///           RPCSEC_GSS_CONTINUE_INIT = 2,
+   ///           RPCSEC_GSS_DESTROY       = 3,
+   ///           RPCSEC_GSS_BIND_CHANNEL  = 4
+   ///  };
+   ///
+   ///  struct rpc_gss_cred_vers_1_t {
+   ///          rpc_gss_proc_t    gss_proc; /* control procedure */
+   ///          unsigned int      seq_num;  /* sequence number */
+   ///          rpc_gss_service_t service;  /* service used */
+   ///          opaque            handle<>; /* context handle */
+   ///  };
+   ///
+   ///  const RPCSEC_GSS_VERS_1 = 1;
+   ///  const RPCSEC_GSS_VERS_2 = 2;
+   ///  const RPCSEC_GSS_VERS_3 = 3; /* new */
+   ///
+   ///  union rpc_gss_cred_t switch (unsigned int rgc_version) {
+   ///  case RPCSEC_GSS_VERS_1:
+   ///  case RPCSEC_GSS_VERS_2:
+   ///  case RPCSEC_GSS_VERS_3: /* new */
+   ///          rpc_gss_cred_vers_1_t rgc_cred_v1;
+   ///  };
+   ///
+   ///  const MAXSEQ = 0x80000000;
+   ///
+   ///  enum rpc_gss3_proc_t {
+   ///          RPCSEC_GSS3_DATA = 0,
+   ///          RPCSEC_GSS3_LIST = 5,
+   ///          RPCSEC_GSS3_CREATE = 6,
+   ///          RPCSEC_GSS3_DESTROY = 7
+   ///  };
+   ///
+   ///  struct rpc_gss_cred_vers_3_t {
+   ///          rpc_gss3_proc_t         gss_proc;
+   ///          unsigned int            seq_num;
+   ///          rpc_gss_service_t       service;
+   ///          opaque                  handle<>;
+   ///          unsigned int            handle_version;
+   ///  };
+   ///
+   ///  struct rpc_gss3_extension {
+   ///          int     type;
+   ///          bool    critical;
+   ///          opaque  data<>;
+   ///  };
+   ///
+   ///  struct rpc_gss3_gss_binding {
+   ///          unsigned int    vers;
+   ///          opaque          handle<>;
+   ///          opaque          nonce<>;
+   ///          opaque          mic<>;
+   ///  };
+   ///
+   ///  typedef opaque rpc_gss3_chan_binding<>;
+   ///
+   ///  typedef opaque rpc_gss3_doi<>;
+   ///  struct rpc_gss3_label {
+   ///          rpc_gss3_doi    doi;
+   ///          opaque          label<>;
+   ///  };
+   ///
+   ///  typedef opaque rpc_gss3_privs<>;
+   ///
+   ///  typedef opaque rpc_gss3_name<>;
+   ///
+   ///  typedef rpc_gss3_name rpc_gss3_group_list<>;
+   ///  struct rpc_gss3_id {
+   ///          rpc_gss3_name         *username;
+   ///          rpc_gss3_group_list   *groups;
+   ///          rpc_gss3_group_list   groups_add;
+   ///          rpc_gss3_group_list   groups_remove;
+   ///  };
+   ///
+   ///  enum rpc_gss3_assertion_type {
+   ///          LABEL = 0,
+   ///          PRIVS = 1,
+   ///          IDENTITY = 2
+   ///  };
+   ///
+   ///  union rpc_gss3_assertion_u
+   ///        switch (rpc_gss3_assertion_type atype) {
+   ///  case LABEL:
+   ///          rpc_gss3_label  label;
+   ///  case PRIVILEGES:
+   ///          rpc_gss3_privs  privs;
+   ///  case IDENTITY:
+   ///          rpc_gss3_id     id;
+   ///  default:
+   ///          opaque          ext<>;
+   ///  };
+   ///
+   ///  struct rpc_gss3_assertion {
+   ///          bool                    critical;
+   ///          rpc_gss3_assertion_u    assertion;
+   ///  };
+   ///
+   ///  struct rpc_gss3_create_args {
+   ///          rpc_gss3_gss_binding    *compound_binding;
+   ///          rpc_gss3_chan_binding   *chan_binding_mic;
+   ///          rpc_gss3_assertion      assertions<>;
+   ///          rpc_gss3_extension      extensions<>;
+   ///  };
+   ///
+   ///  struct rpc_gss3_create_res {
+   ///          opaque                  handle<>;
+   ///          rpc_gss3_chan_binding   *chan_binding_mic;
+   ///          rpc_gss3_assertion      granted_assertions<>;
+   ///          rpc_gss3_assertion      assertions_denied<>;
+   ///          rpc_gss3_assertion      assertions_not_understood<>;
+   ///          rpc_gss3_assertion      server_assertions<>;
+   ///          rpc_gss3_extension      extensions<>;
+   ///  };
+   ///
+   ///  enum rpc_gss3_list_item {
+   ///          DOI = 0,
+   ///          PRIV = 1,
+   ///          PRIV_GROUP = 2
+   ///  };
+   ///
+   ///  struct rpc_gss3_list_args {
+   ///          rpc_gss3_list_item      list_what<>;
+   ///  };
+   ///
+   ///  union rpc_gss3_list_item_u
+   ///        switch (rpc_gss3_list_item itype) {
+   ///  case DOI:
+   ///          rpc_gss3_doi    dois<>;
+   ///  case PRIV:
+   ///          string          privs<>;
+   ///  case PRIV_GROUP:
+   ///          string          priv_groups<>;
+   ///  default:
+   ///          opaque          ext<>;
+   ///  };
+   ///
+   ///  typedef rpc_gss3_list_item_u rpc_gss3_list_res<>;
     </artwork>
   </figure>
 
