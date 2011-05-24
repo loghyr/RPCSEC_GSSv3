@@ -334,19 +334,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          opaque            handle<>; /* context handle */
    ///  };
    ///
-   ///  const RPCSEC_GSS_VERS_1 = 1;
-   ///  const RPCSEC_GSS_VERS_2 = 2;
-   ///  const RPCSEC_GSS_VERS_3 = 3; /* new */
-   ///
-   ///  union rpc_gss_cred_t switch (unsigned int rgc_version) {
-   ///  case RPCSEC_GSS_VERS_1:
-   ///  case RPCSEC_GSS_VERS_2:
-   ///  case RPCSEC_GSS_VERS_3: /* new */
-   ///          rpc_gss_cred_vers_1_t rgc_cred_v1;
-   ///  };
-   ///
-   ///  const MAXSEQ = 0x80000000;
-   ///
    ///  enum rpc_gss3_proc_t {
    ///          RPCSEC_GSS3_DATA = 0,
    ///          RPCSEC_GSS3_LIST = 5,
@@ -361,6 +348,20 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          opaque                  handle<>;
    ///          unsigned int            handle_version;
    ///  };
+   ///
+   ///  const RPCSEC_GSS_VERS_1 = 1;
+   ///  const RPCSEC_GSS_VERS_2 = 2;
+   ///  const RPCSEC_GSS_VERS_3 = 3; /* new */
+   ///
+   ///  union rpc_gss_cred_t switch (unsigned int rgc_version) {
+   ///  case RPCSEC_GSS_VERS_1:
+   ///  case RPCSEC_GSS_VERS_2:
+   ///          rpc_gss_cred_vers_1_t rgc_cred_v1;
+   ///  case RPCSEC_GSS_VERS_3: /* new */
+   ///          rpc_gss_cred_vers_3_t rgc_cred_v3;
+   ///  };
+   ///
+   ///  const MAXSEQ = 0x80000000;
    ///
    ///  struct rpc_gss3_extension {
    ///          int     type;
