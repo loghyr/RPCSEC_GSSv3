@@ -24,25 +24,25 @@ all: html txt
 # Build the stuff needed to ensure integrity of document.
 common: testx html
 
-txt: draft-williams-rpcsecgssv3-$(VERS).txt
+txt: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt
 
-html: draft-williams-rpcsecgssv3-$(VERS).html
+html: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html
 
-nr: draft-williams-rpcsecgssv3-$(VERS).nr
+nr: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr
 
-xml: draft-williams-rpcsecgssv3-$(VERS).xml
+xml: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 
 clobber:
-	$(RM) draft-williams-rpcsecgssv3-$(VERS).txt \
-		draft-williams-rpcsecgssv3-$(VERS).html \
-		draft-williams-rpcsecgssv3-$(VERS).nr
+	$(RM) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt \
+		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html \
+		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr
 	export SPECVERS := $(VERS)
 	export VERS := $(VERS)
 
 clean:
 	rm -f $(AUTOGEN)
 	rm -rf autogen
-	rm -f draft-williams-rpcsecgssv3-$(VERS).xml
+	rm -f draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -rf draft-$(VERS)
 	rm -f draft-$(VERS).tar.gz
 	rm -rf testx.d
@@ -55,19 +55,19 @@ pall:
 	( $(MAKE) html ; echo .html done ) & \
 	wait
 
-draft-williams-rpcsecgssv3-$(VERS).txt: draft-williams-rpcsecgssv3-$(VERS).xml
+draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -f $@ draft-tmp.txt
-	sh xml2rfc_wrapper.sh draft-williams-rpcsecgssv3-$(VERS).xml draft-tmp.txt
+	sh xml2rfc_wrapper.sh draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.txt
 	mv draft-tmp.txt $@
 
-draft-williams-rpcsecgssv3-$(VERS).html: draft-williams-rpcsecgssv3-$(VERS).xml
+draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -f $@ draft-tmp.html
-	sh xml2rfc_wrapper.sh draft-williams-rpcsecgssv3-$(VERS).xml draft-tmp.html
+	sh xml2rfc_wrapper.sh draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.html
 	mv draft-tmp.html $@
 
-draft-williams-rpcsecgssv3-$(VERS).nr: draft-williams-rpcsecgssv3-$(VERS).xml
+draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -f $@ draft-tmp.nr
-	sh xml2rfc_wrapper.sh draft-williams-rpcsecgssv3-$(VERS).xml $@.tmp
+	sh xml2rfc_wrapper.sh draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml $@.tmp
 	mv draft-tmp.nr $@
 
 rpcsecgssv3_front_autogen.xml: rpcsecgssv3_front.xml Makefile
@@ -108,18 +108,18 @@ draft-tmp.xml: $(START) Makefile $(END)
 		cat $(END) >> $@.tmp
 		mv $@.tmp $@
 
-draft-williams-rpcsecgssv3-$(VERS).xml: draft-tmp.xml $(IDCONTENTS) $(AUTOGEN)
+draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml: draft-tmp.xml $(IDCONTENTS) $(AUTOGEN)
 		rm -f $@
 		cp draft-tmp.xml $@
 
 genhtml: Makefile gendraft html txt draft-$(VERS).tar
 	./gendraft draft-$(PREVVERS) \
-		draft-williams-rpcsecgssv3-$(PREVVERS).txt \
+		draft-ietf-nfsv4-rpcsec-gssv3-$(PREVVERS).txt \
 		draft-$(VERS) \
-		draft-williams-rpcsecgssv3-$(VERS).txt \
-		draft-williams-rpcsecgssv3-$(VERS).html \
-		draft-williams-rpcsecgssv3-dot-x-04.txt \
-		draft-williams-rpcsecgssv3-dot-x-05.txt \
+		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt \
+		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html \
+		draft-ietf-nfsv4-rpcsec-gssv3-dot-x-04.txt \
+		draft-ietf-nfsv4-rpcsec-gssv3-dot-x-05.txt \
 		draft-$(VERS).tar.gz
 
 testx: 
@@ -142,9 +142,9 @@ AUXFILES = \
 	xml2rfc
 
 DRAFTFILES = \
-	draft-williams-rpcsecgssv3-$(VERS).txt \
-	draft-williams-rpcsecgssv3-$(VERS).html \
-	draft-williams-rpcsecgssv3-$(VERS).xml
+	draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt \
+	draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html \
+	draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 
 draft-$(VERS).tar: $(IDCONTENTS) $(START_PREGEN) $(FRONT_PREGEN) $(AUXFILES) $(DRAFTFILES)
 	rm -f draft-$(VERS).tar.gz
