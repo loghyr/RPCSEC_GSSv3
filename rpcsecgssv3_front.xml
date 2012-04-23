@@ -49,7 +49,7 @@
         security protocol (RPCSEC_GSS).  This protocol provides for: compound
         authentication of client hosts and users to server (constructed by
         generic composition), channel binding, security label assertions for
-        multi-level and type enforcement, privilege assertions and identity
+        multi-level and type enforcement, privilege assertions, and identity
         assertions.
       </t>
     </abstract>
