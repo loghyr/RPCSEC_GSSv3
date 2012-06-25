@@ -1,4 +1,4 @@
-# Copyright (C) The IETF Trust (2011)
+# Copyright (C) The IETF Trust (2011-2012)
 #
 
 YEAR=`date +%Y`
@@ -6,6 +6,7 @@ MONTH=`date +%B`
 DAY=`date +%d`
 PREVVERS=02
 VERS=03
+XML2RFC=xml2rfc.tcl
 
 autogen/%.xml : %.x
 	@mkdir -p autogen
@@ -57,17 +58,17 @@ pall:
 
 draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -f $@ draft-tmp.txt
-	sh xml2rfc_wrapper.sh draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.txt
+	$(XML2RFC) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.txt
 	mv draft-tmp.txt $@
 
 draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -f $@ draft-tmp.html
-	sh xml2rfc_wrapper.sh draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.html
+	$(XML2RFC) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.html
 	mv draft-tmp.html $@
 
 draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
 	rm -f $@ draft-tmp.nr
-	sh xml2rfc_wrapper.sh draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml $@.tmp
+	$(XML2RFC) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml $@.tmp
 	mv draft-tmp.nr $@
 
 rpcsecgssv3_front_autogen.xml: rpcsecgssv3_front.xml Makefile
