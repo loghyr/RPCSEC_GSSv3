@@ -164,40 +164,19 @@
    <format type='TXT' octets='66160' target='ftp://ftp.isi.edu/in-notes/rfc5226.txt' />
    </reference>
 
-    <reference anchor='RFC3530bis'>
+    <reference anchor='ref:nfsv4.2'>
       <front>
-        <title>Network File System (NFS) version 4 Protocol</title>
-        <author initials="T." surname="Haynes" fullname="T. Haynes">
-          <organization>NetApp</organization>
-        </author>
-        <author initials="D." surname="Noveck" fullname="D. Noveck">
-          <organization>EMC Corporation</organization>
-        </author>
-        <date year="2011" month="March" />
-      </front>
-      <seriesInfo name="draft-ietf-nfsv4-rfc3530bis-09" value="(Work In Progress)"/>
+        <title>NFS Version 4 Minor Version 2</title>
 
+        <author initials='T' surname='Haynes' fullname='Thomas Haynes'>
+          <organization abbrev='NetApp' />
+        </author>
+
+        <date month='October' year='2012' />
+      </front>
+      <seriesInfo name="draft-ietf-nfsv4-minorversion2-16" value="(Work In Progress)"/>
     </reference>
 
-
-    <reference anchor='RFC5661'>
-      <front>
-	<title>Network File System (NFS) Version 4 Minor Version 1 Protocol</title>
-	<author initials="S." surname="Shepler" fullname="S. Shepler">
-	  <organization>Storspeed, Inc.</organization>
-	</author>
-	<author initials="M." surname="Eisler" fullname="M. Eisler">
-	  <organization>NetApp</organization>
-	</author>
-	<author initials="D." surname="Noveck" fullname="D. Noveck">
-	  <organization>NetApp</organization>
-	</author>
-	<date year="2010" month="January"/>
-      </front>
-      <seriesInfo name="RFC" value="5661"/>
-      <format type="TXT" octets="600988" 
-	      target="ftp://ftp.isi.edu/in-notes/rfc5661.txt"/>
-    </reference>
 
   <reference anchor='RFC5056'>
     <front>
@@ -226,3 +205,79 @@
   </reference>
         
 </references>
+
+<references title="Informative References">
+
+  <reference anchor='ref:rh_mls'>
+    <front>
+      <title>
+        Section 46.6. Multi-Level Security (MLS) of Deployment Guide:
+        Deployment, configuration and administration of Red Hat Enterprise
+        Linux 5, Edition 6
+      </title>
+      <author />
+      <date year='2011' />
+    </front>
+    <format type='HTML' target='http://docs.redhat.com/docs/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/sec-mls-ov.html' />
+  </reference>
+
+<reference anchor='DTOS'
+target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
+  <front>
+    <title abbrev='DTOS'>
+      The Distributed Trusted Operating System (DTOS) Home Page
+    </title>
+    <author initials='S.' surname='Smalley' fullname='Stephen Smalley'>
+      <organization>
+      National Security Agency
+      </organization>
+    </author>
+  </front>
+</reference>
+
+ <reference anchor='SENFSV3' target='http://www.nsa.gov/research/_files/selinux/papers/nfsv3.pdf'>
+    <front>
+      <title abbrev='SENFSv3'>Implementing SELinux Support for NFS</title>
+      <author initials="J.W." surname="Carter" fullname="James W. Carter">
+        <organization abbrev="NSA">
+        National Security Agency
+        </organization>
+        <address>
+          <postal>
+            <street>9800 Savage Rd.</street>
+            <street>Suite 6534</street>
+            <city>Ft. Meade</city>
+            <region>MD</region>
+            <code>20755-6534</code>
+          </postal>
+          <email>jwcart2@tycho.nsa.gov</email>
+        </address>
+      </author>
+    </front>
+  </reference>
+
+
+    <reference anchor="ref:lfsreg">
+      <front>
+        <title>Registry Specification for MAC Security Label Formats</title>
+        <author initials="D." surname="Quigley" />
+        <author initials="J." surname="Lu" />
+        <date year="2011" />
+      </front>
+      <seriesInfo name="draft-quigley-label-format-registry" value="(work in progress)"/>
+    </reference>
+
+    <reference anchor="ref:lnfs_req">
+      <front>
+        <title>
+          Requirements for Labeled NFS
+        </title>
+        <author initials='T.' surname='Haynes' fullname='T. Haynes'>
+          <organization />
+        </author>
+      </front>
+      <seriesInfo name="draft-ietf-nfsv4-labreqs-03" value="(work in progress)" />
+    </reference>
+
+</references>
+

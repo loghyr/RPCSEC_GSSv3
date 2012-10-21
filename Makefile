@@ -4,8 +4,8 @@
 YEAR=`date +%Y`
 MONTH=`date +%B`
 DAY=`date +%d`
-PREVVERS=02
-VERS=03
+PREVVERS=03
+VERS=04
 XML2RFC=xml2rfc.tcl
 
 autogen/%.xml : %.x

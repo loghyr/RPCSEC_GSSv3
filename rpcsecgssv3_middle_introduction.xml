@@ -1,7 +1,6 @@
-<!-- Copyright (C) The IETF Trust (2011) -->
-<!-- Copyright (C) The Internet Society (2011) -->
+<!-- Copyright (C) The IETF Trust (2012) -->
+<!-- Copyright (C) The Internet Society (2012) -->
 <section anchor="sec:intro" title="Introduction">
-
   <t>
     The original RPCSEC_GSS protocol <xref target="RFC2203" /> provided for
     authentication of RPC clients and servers to each other using the
@@ -40,7 +39,8 @@
         <list style='symbols'>
           <t>
             security labels (for multi-level, type enforcement, and other
-            labeled security models) [add refs. for labeled security]
+            labeled security models) (see <xref target='ref:rh_mls' />,
+            <xref target='DTOS' />, and <xref target='SENFSV3' />)
           </t>
 
           <t>
@@ -75,7 +75,13 @@
 
   <t>
     We also add an option for enumerating server-side domains of
-    interpretation (DOI), though this seems likely to be unnecessary.
+    interpretation (DOI),
+
+    <cref anchor='AI1' source='TH'>
+      No DOI in the LFS, why here?
+      Adapt with the new format!
+    </cref>
+  
   </t>
 
   <t>
@@ -94,7 +100,7 @@
         in all subsequent exchanges using the child handle (this works
         because the RPCSEC_GSS handle is included in the integrity
         protected RPCSEC_GSS auth/verifier header for all versions of
-        RPCSEC_GSS)
+        RPCSEC_GSS).
       </t>
     </list>
   </t>
@@ -110,63 +116,8 @@
 
     <t>
       The initial motivation for RPCSEC_GSSv3 is to add support for labeled
-      security.  Several alternatives to revising RPCSEC_GSS were
-      considered:
-
-      <list style="letters">
-        <t>
-          application-level protocol extensions, such as new operations for
-          the Network File System version 4 (NFSv4) protocol <xref target="RFC3530bis" />;
-        </t>
-
-        <t>
-          a stackable GSS-API pseudo-mechanism that could be composed with
-          concrete GSS-API mechanisms to provide both, authentication and
-          protected security label assertions;
-        </t>
-
-        <t>
-          per-GSS-API mechanism extensions for transporting security label
-          assertions;
-        </t>
-      </list>
-    </t>
-
-    <t>
-      Alternative (c) is not sufficiently general.  One possible benefit of
-      (c) might be the ability to have per-{user, label} credentials,
-      though that might be difficult to manage (and, anyways, can be
-      emulated with regular GSS-API mechanisms through principal naming
-      conventions), whereas with the other approaches there is a single
-      credential per-user that can be used to assert multiple security
-      labels.
-    </t>
-
-    <t>
-      Alternative (a) is not general either, though for the purpose of the
-      NFSv4 community it would suffice.  However, a solution at the
-      RPCSEC_GSS or GSS-API layers does, or arguably should, fit more
-      naturally into most, if not all, NFSv4 implementations.
-    </t>
-
-    <t>
-      Alternative (b) is certainly general enough.  In fact, it is more
-      general than the RPCSEC_GSSv3 solution in that it could be used in
-      non-RPC protocols that support the use of the GSS-API.  However, the
-      RPCSEC_GSSv3 approach is attractively simple.  For example, to pursue
-      (b) would likely entail having to specify a framework for mechanism
-      composition, as well as GSS-API interfaces to access assertions that
-      would typically be very platform-specific.  (The KITTEN WG has
-      explored stackable pseudo-mechanisms in the past, but that work is
-      currently stagnant.)  It is possible that stackable pseudo-mechanisms
-      may materialize in the future; such mechanisms would be usable
-      through all versions of RPCSEC_GSS so far.
-    </t>
-
-    <t>
-      As we considered these alternatives we also realized that we needed
-      other features that could all be packed into a single solution.  For
-      example, the assertion of security label is conceptually equivalent,
+      security for NFSv4 (see <xref target='ref:lnfs_req' />).
+      We also realized that the assertion of security label is conceptually equivalent,
       protocol-wise, to assertions of privilege and identity.
     </t>
 
@@ -191,8 +142,8 @@
   <section anchor="ss:aor" title="Applications of RPCSEC_GSSv3">
 
     <t>
-      The common uses of RPCSEC_GSSv3, particularly for NFSv4, are expected
-      to be:
+      The common uses of RPCSEC_GSSv3, particularly for
+      NFSv4 <xref target='ref:nfsv4.2' />, are expected to be:
 
       <list style="letters">
         <t>
@@ -208,9 +159,26 @@
         <t>
           client-side process credentials assertion [+ privilege assertion]
           as a replacement for AUTH_SYS that is more secure than AUTH_SYS
-          while not requiring per-user credentials
+          while not requiring per-user credentials.
         </t>
       </list>
+    </t>
+
+    <t>
+      A traditional file copy entails the client gaining access to
+      a file on the source, reading it, and writing it to a file on
+      the destination.  In Server-side Copy
+      (see Section 2 of <xref target='ref:nfsv4.2' />),
+      the client first secures access to both source and destination
+      and then authorizes the destination and source to copy the file.
+      RPCSEC_GSSv3 is used to allow the destination authentication
+      with the source.
+    </t>
+
+    <t>
+      Labeled NFS (see Section 7 of <xref target='ref:nfsv4.2' /> uses
+      the subject label provided by the client via the RPCSEC_GSSv3 layer to
+      enforce MAC access to objects owned by the server.
     </t>
   </section>
 </section>
@@ -552,7 +520,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </figure>
 
       <t>
-        XXX: fix above into YYY. All the entries are TBD...
+        <cref anchor='AI2' source='NW'>
+          XXX: fix above into YYY. All the entries are TBD...
+        </cref>
       </t>
 
     </section>
@@ -604,7 +574,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         authorization and identity assertions.  Policies should take into
         account the identity of the client and/or user as authenticated via
         the GSS-API.  Server implementation and policy MAY result in labels,
-        privileges and identities being mapped to concepts and values that
+        privileges, and identities being mapped to concepts and values that
         are local to the server.
       </t>
 
@@ -756,6 +726,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 
         <t>
+          <cref anchor='AI3' source='TH'>
+            ...?
+          </cref>
+        </t>
+
+        <t>
           Any RPCSEC_GSSv3 context handle that has been bound to a secure
           channel in this way SHOULD be used only with the
           rpc_gss_svc_channel_prot, and SHOULD NOT be used with
@@ -777,11 +753,19 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
         <t>
           Label encoding is specific to each DOI and not described herein.  DOI
-          encoding is TBD [fill in...  Solaris uses integers to name DOIs,
-          and there is an IANA registry of DOIs as 32-bit integers, and IPsec
-          (whence the IANA registry) and CALIPSO use 32-bit integers for DOIs
-          as well.  So a 32-bit unsinged integer seems to be the way to go.
-          Add references... -Nico]
+          encoding is TBD.
+
+          <cref anchor='AI4' source='NW'>
+            [fill in...  Solaris uses integers to name DOIs,
+            and there is an IANA registry of DOIs as 32-bit integers, and IPsec
+            (whence the IANA registry) and CALIPSO use 32-bit integers for DOIs
+            as well.  So a 32-bit unsinged integer seems to be the way to go.
+            Add references... -Nico]
+          </cref>
+
+          <cref anchor='AI4:response' source='TH'>
+            This is just the LNFS format, so update it.
+          </cref>
         </t>
 
         <t>
@@ -799,10 +783,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 
         <t>
-          Servers that don't support labeling MUST ignore non-critical label
-          assertions.  Servers that don't support the requested DOI MUST either
+          Servers that do not support labeling MUST ignore non-critical label
+          assertions.  Servers that do not support the requested DOI MUST either
           ignore non-critical label assertions or map them to a suitable label
-          in a supported DOI.  Servers that don't support labeling or don't
+          in a supported DOI.  Servers that do not support labeling or do not
           support the requested DOI MUST return an error if the label request
           is critical.  Servers that support labeling in the requested DOI MAY
           map the requested label to different label as a result of server-side
@@ -832,7 +816,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           RPC applications that wish to use this facility must define the set
           of known privileges, and must specify which privileges are in the
           "basic" privilege group.  For example, NFSv4 might specify privileges
-          for reading, writing, chowning, linking, etcetera.
+          for reading, writing, chowning, linking, etc.
         </t>
       </section>
 
@@ -890,7 +874,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
             </t>
 
             <t>
-              etcetera
+              etc.
             </t>
           </list>
         </t>
@@ -1058,17 +1042,29 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
 
   <t>
-    [What about NFSv3?  The representation of privs would be the same for
-    v3 as for v4, though there'd be no privs for dealing with labels
-    (file_downgrade_sl and file_update_sl).  And the representation of
-    users/groups would NFSv3's representation thereof.  But should we
-    bother to specify this? -Nico]
+    <cref anchor='AI5' source='NW'>
+      [What about NFSv3?  The representation of privs would be the same for
+      v3 as for v4, though there'd be no privs for dealing with labels
+      (file_downgrade_sl and file_update_sl).  And the representation of
+      users/groups would NFSv3's representation thereof.  But should we
+      bother to specify this? -Nico]
+    </cref>
+
+    <cref anchor='AI5:resp' source='TH'>
+      Need a use case to justify v3 development.
+    </cref>
   </t>
 
   <t>
-    [Also, this is derived from Solaris' notion of privileges.  We should
-    look at how well this scheme relates to other operating systems as
-    NFSv4 clients and servers. -Nico]
+    <cref anchor='AI6' source='NW'>
+      [Also, this is derived from Solaris' notion of privileges.  We should
+      look at how well this scheme relates to other operating systems as
+      NFSv4 clients and servers. -Nico]
+    </cref>
+
+    <cref anchor='AI6:resp' source='TH'>
+      On the radar.
+    </cref>
   </t>
 
   <t>
@@ -1125,7 +1121,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
 
   <t>
-   The RPCSEC_GSSv3 protocol also provides for a replacement of the old
+    The RPCSEC_GSSv3 protocol also provides for a replacement of the old
     AUTH_SYS RPC authentication flavor.  AUTH_SYS relies on "privileged
     port numbers" for "authentication," and was quite limited in what
     assertions it supported and incompatible with NFSv4 representations
@@ -1160,11 +1156,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     protect any callbacks.  Specifically, it is important that the server
     use RPCSEC_GSS context handles which authenticate the client to
     protect any callbacks relating to server state initiated by RPCs
-    protected by RPCSEC_GSSv3 contexts.  [Add text about interaction with
-    GSS-SSV...]
-  </t>
+    protected by RPCSEC_GSSv3 contexts.
 
-  <t>
-    [Anything else?]
+    <cref anchor='AI7' source='NW'>
+      [Add text about interaction with GSS-SSV...]
+    </cref>
   </t>
 </section>
