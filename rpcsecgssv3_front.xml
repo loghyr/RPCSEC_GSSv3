@@ -6,21 +6,20 @@
     Remote Procedure Call (RPC) Security Version 3
     </title>
 
-    <author fullname="Thomas Haynes" 
-            initials="T." 
-            surname="Haynes"
-            role="editor">
+    <author fullname="William A. (Andy) Adamson" 
+            initials="W." 
+            surname="Adamson" >
         <organization abbrev="NetApp">NetApp</organization>
         <address>
             <postal>
-                <street>9110 E 66th St</street>
-                <city>Tulsa</city>
-                <region>OK</region>
-                <code>74133</code>
+                <street>3629 Wagner Ridge Ctt</street>
+                <city>Ann Arbor</city>
+                <region>MI</region>
+                <code>48103</code>
                 <country>USA</country>
             </postal>
-            <phone>+1 918 307 1415</phone>
-            <email>thomas@netapp.com</email>
+            <phone>+1 734 665 1204</phone>
+            <email>andros@netapp.com</email>
         </address>
     </author>
   <author initials='N.' surname='Williams'
@@ -47,11 +46,11 @@
     <abstract>
       <t>
         This document specifies version 3 of the Remote Procedure Call (RPC)
-        security protocol (RPCSEC_GSS).  This protocol provides for: compound
+        security protocol (RPCSEC_GSS).  This protocol provides for compound
         authentication of client hosts and users to server (constructed by
-        generic composition), channel binding, security label assertions for
-        multi-level and type enforcement, privilege assertions, and identity
-        assertions.
+        generic composition), security label assertions for
+        multi-level and type enforcement, structured privilege assertions,
+        and channel bindings.
       </t>
     </abstract>
 

@@ -172,9 +172,9 @@
           <organization abbrev='NetApp' />
         </author>
 
-        <date month='October' year='2012' />
+        <date month='March' year='2013' />
       </front>
-      <seriesInfo name="draft-ietf-nfsv4-minorversion2-16" value="(Work In Progress)"/>
+      <seriesInfo name="draft-ietf-nfsv4-minorversion2-19" value="(Work In Progress)"/>
     </reference>
 
 

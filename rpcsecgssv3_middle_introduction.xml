@@ -7,81 +7,83 @@
     Generic Security Services Application Programming Interface (GSS-API)
     <xref target="RFC2743" />.  The second version of
     RPCSEC_GSS <xref target="RFC1831" />  added support
-    for channel binding <xref target="RFC5056" />.
+    for channel bindings <xref target="RFC5056" />.
   </t>
 
   <t>
     We find that GSS-API mechanisms are insufficient for communicating
-    certain aspects of a client's identity and authority to a server.
+    certain aspects of a client's authority to a server.
     The GSS-API and its mechanisms certainly could be extended to address
-    this shortcomming, but it seems be far simpler to address it at the
+    this shortcoming, but it seems be far simpler to address it at the
     application layer, namely, in this case, RPCSEC_GSS.
   </t>
 
   <t>
-    We therefore provide a new version of RPCSEC_GSS that allows for the
+    The motivation for RPCSEC_GSSv3 is to add support for labeled security
+    and server-side copy for NFSv4 (see <xref target='ref:nfsv4.2' /> and
+    <xref target='ref:lnfs_req' />). Both of these features require assertions
+    of authority from the client.
+  </t>
+
+  <t>
+    Assertions need to be verified.
+    One party that can verify an assertion is the client host, which can
+    authenticate to the server using its own credentials. We can also
+    require users to verify an assertion as well.  This calls
+    for compound authentication.
+  </t>
+
+
+  <t>
+   Because the design of RPCSEC_GSSv3 relies on either RPCSEC_GSS version 1
+   (though version 2 can be used) to do the actual GSS-API security context
+   establishment, we add support for channel binding so that implementors
+   who have implemented RPCSEC_GSS version 1 but not version 2 can provide
+   a (simplified) channel binding implementation using RPCSEC_GSSv3. 
+  </t>
+
+  <t>
+    We therefore describe a new version of RPCSEC_GSS that allows for the
     following:
 
     <list style='symbols'>
       <t>
-        compound authentication of the client host and user to the server
-        (done by binding of two RPCSEC_GSS handles)
-      </t>
-
-      <t>
-        channel binding (even though RPCSEC_GSSv2 provides this also; see
-        below)
-      </t>
-
-      <t>
-        client-side assertions of authority:
+        Client-side assertions of authority:
 
         <list style='symbols'>
           <t>
-            security labels (for multi-level, type enforcement, and other
-            labeled security models) (see <xref target='ref:rh_mls' />,
-            <xref target='DTOS' />, and <xref target='SENFSV3' />)
+            Security labels for multi-level, type enforcement, and other
+            labeled security models. See <xref target='ref:rh_mls' />,
+            <xref target='DTOS' />, <xref target='SENFSV3' />,
+            <xref target='ref:nfsv4.2' /> and <xref target='ref:lnfs_req' />.
           </t>
-
           <t>
-            application-specific privileges
+            Application-specific structured privileges. For an example
+            see server-side copy <xref target='ref:nfsv4.2' />.
           </t>
-        </list>
+      <t>
+        Compound authentication of the client host and user to the server
+        done by binding two RPCSEC_GSS handles.
       </t>
 
       <t>
-        client-side assertions of identity:
-
-        <list style='symbols'>
-          <t>
-            primary client/user identity
-          </t>
-
-          <t>
-            supplementary group memberships of the client/user, including
-            support for specifying deltas to the membership list as seen on
-            the server
-          </t>
+        Simplified channel binding. 
+      </t>
         </list>
       </t>
     </list>
   </t>
 
   <t>
-    Assertions of labels, privilege and identity are evaluated by the
+    Assertions of labels and privileges are evaluated by the
     server, which may then map the asserted values to other values, all
     according to server-side policy.
   </t>
 
   <t>
-    We also add an option for enumerating server-side domains of
-    interpretation (DOI),
-
-    <cref anchor='AI1' source='TH'>
-      No DOI in the LFS, why here?
-      Adapt with the new format!
-    </cref>
-  
+    We also add an option for enumerating active server-side privileges and
+    supported label format specifiers (LFS).  The LFS and Label Format
+    Registry are described in detail in <xref target='ref:lfsreg' />.
   </t>
 
   <t>
@@ -89,21 +91,31 @@
 
     <list style='symbols'>
       <t>
-        a client uses an existing RPCSEC_GSS context handle (of any
-        RPCSEC_GSS version) to protect RPCSEC_GSSv3 exchanges (this will
-        be termed the "parent" or "outer" handle)
+        A client uses an existing RPCSEC_GSSv1 (or RPCSEC_GSSv2) context
+        handle to protect RPCSEC_GSSv3 exchanges (this will be termed the
+        "parent" handle)
       </t>
 
       <t>
-        the server issues a "child" RPCSEC_GSSv3 handle, but the
+        The server issues a "child" RPCSEC_GSSv3 handle, but the
         underlying GSS-API security context for the parent handle is used
-        in all subsequent exchanges using the child handle (this works
+        in all subsequent exchanges using the child handle. This works
         because the RPCSEC_GSS handle is included in the integrity
         protected RPCSEC_GSS auth/verifier header for all versions of
-        RPCSEC_GSS).
+        RPCSEC_GSS.
+        The child context, however, has its own sequence number space and
+        window, distinct from that of the parent.
       </t>
     </list>
   </t>
+      <t>
+        <cref anchor='AI1' source='AA'>
+         RFC22203 states that when data integrity is used, the seq_num in the
+         rpc_gss_data_t must be the same as in the credential. This means that
+         using data integrity with GSS3 context's can not simply construct it
+         using the parent context as the seq_num must be from the GSS3 context. 
+        </cref>
+      </t>
 
   <t>
     This means that RPCSEC_GSSv3 depends on RPCSEC_GSS versions 1 and/or
@@ -111,33 +123,6 @@
     specification of RPCSEC_GSSv3 simple by avoiding the need to
     duplicate the core functionality of RPCSEC_GSS version 1.
   </t>
-
-  <section anchor="ss:mot" title="Motivation">
-
-    <t>
-      The initial motivation for RPCSEC_GSSv3 is to add support for labeled
-      security for NFSv4 (see <xref target='ref:lnfs_req' />).
-      We also realized that the assertion of security label is conceptually equivalent,
-      protocol-wise, to assertions of privilege and identity.
-    </t>
-
-    <t>
-      Additionally, assertions need to be verified, and in this case the
-      one party that can verify an assertion is the client host, which can
-      authenticate to the server using its own credentials.  Yet we want to
-      continue authenticating users as well.  This calls for compound
-      authentication.
-    </t>
-
-    <t>
-      Finally, because the design of RPCSEC_GSSv3 relies on RPCSEC_GSSv1
-      (though v2 can also be used) to do the actual GSS-API security
-      context establishment, we add support for channel binding so that
-      implementors who have implemented RPCSEC_GSSv1 but not version 2 can
-      still provide channel binding without having to implement version 2.
-      Channel binding is accomplished in a more simple manner in v3 also.
-    </t>
-  </section>
 
   <section anchor="ss:aor" title="Applications of RPCSEC_GSSv3">
 
@@ -151,34 +136,37 @@
           privilege assertion] + compound client host & user
           authentication;
         </t>
-
         <t>
-          compound client host & user authentication [+ privilege assertion];
-        </t>
-
-        <t>
-          client-side process credentials assertion [+ privilege assertion]
-          as a replacement for AUTH_SYS that is more secure than AUTH_SYS
-          while not requiring per-user credentials.
+          compound client host & user authentication [+
+          critical structured privilege assertions] used in inter-server
+          server-side copy;
         </t>
       </list>
     </t>
 
     <t>
-      A traditional file copy entails the client gaining access to
-      a file on the source, reading it, and writing it to a file on
-      the destination.  In Server-side Copy
-      (see Section 2 of <xref target='ref:nfsv4.2' />),
-      the client first secures access to both source and destination
-      and then authorizes the destination and source to copy the file.
-      RPCSEC_GSSv3 is used to allow the destination authentication
-      with the source.
+      Labeled NFS (see Section 8 of <xref target='ref:nfsv4.2' />) uses
+      the subject label provided by the client via the RPCSEC_GSSv3 layer to
+      enforce MAC access to objects owned by the server to enable server 
+      guest mode or full mode labeled NFS.
     </t>
+      <t>
+        <cref anchor='AI2' source='AA'>
+          check that this language states what NFSv4.2 labeled
+          NFS problem we are really solving. (setting labels on the server) 
+        </cref>
+      </t>
+
 
     <t>
-      Labeled NFS (see Section 7 of <xref target='ref:nfsv4.2' /> uses
-      the subject label provided by the client via the RPCSEC_GSSv3 layer to
-      enforce MAC access to objects owned by the server.
+      A traditional inter-server file copy entails the user gaining access to
+      a file on the source, reading it, and writing it to a file on
+      the destination.  In secure NFSv4 inter-server server-side copy
+      (see Section 3.4.1 of <xref target='ref:nfsv4.2' />),
+      the user first secures access to both source and destination files,
+      and then uses RPCSEC_GSSv3 compound authentication and structured privileges
+      to authorize the destination to copy the file from the source on behalf
+      of the user.
     </t>
   </section>
 </section>
@@ -227,7 +215,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <figure>
     <artwork>
    ///  /*
-   ///   * Copyright (c) 2011 IETF Trust and the persons
+   ///   * Copyright (c) 2013 IETF Trust and the persons
    ///   * identified as the document authors. All rights
    ///   * reserved.
    ///   *
@@ -346,28 +334,25 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///
    ///  typedef opaque rpc_gss3_chan_binding<>;
    ///
-   ///  typedef opaque rpc_gss3_doi<>;
+   ///  struct rpc_gss3_lfs {
+   ///          unsigned int lfs_id;
+   ///          unsigned int pi_id;
+   ///  };
+   ///
    ///  struct rpc_gss3_label {
-   ///          rpc_gss3_doi    doi;
+   ///          rpc_gss3_lfs    lfs;
    ///          opaque          label<>;
    ///  };
    ///
-   ///  typedef opaque rpc_gss3_privs<>;
-   ///
-   ///  typedef opaque rpc_gss3_name<>;
-   ///
-   ///  typedef rpc_gss3_name rpc_gss3_group_list<>;
-   ///  struct rpc_gss3_id {
-   ///          rpc_gss3_name         *username;
-   ///          rpc_gss3_group_list   *groups;
-   ///          rpc_gss3_group_list   groups_add;
-   ///          rpc_gss3_group_list   groups_remove;
+   ///  typedef string rpc_gss3_list_name<>;
+   ///  struct rpc_gss3_privs {
+   ///          rpc_gss3_list_name      listname;   
+   ///          opaque                  privilege<>;
    ///  };
    ///
    ///  enum rpc_gss3_assertion_type {
    ///          LABEL = 0,
-   ///          PRIVS = 1,
-   ///          IDENTITY = 2
+   ///          PRIVS = 1
    ///  };
    ///
    ///  union rpc_gss3_assertion_u
@@ -376,8 +361,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          rpc_gss3_label  label;
    ///  case PRIVILEGES:
    ///          rpc_gss3_privs  privs;
-   ///  case IDENTITY:
-   ///          rpc_gss3_id     id;
    ///  default:
    ///          opaque          ext<>;
    ///  };
@@ -398,16 +381,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          opaque                  handle<>;
    ///          rpc_gss3_chan_binding   *chan_binding_mic;
    ///          rpc_gss3_assertion      granted_assertions<>;
-   ///          rpc_gss3_assertion      assertions_denied<>;
-   ///          rpc_gss3_assertion      assertions_not_understood<>;
-   ///          rpc_gss3_assertion      server_assertions<>;
-   ///          rpc_gss3_extension      extensions<>;
+   ///          rpc_gss3_extension      granted_extensions<>;
    ///  };
    ///
    ///  enum rpc_gss3_list_item {
-   ///          DOI = 0,
+   ///          LABEL = 0,
    ///          PRIV = 1,
-   ///          PRIV_GROUP = 2
    ///  };
    ///
    ///  struct rpc_gss3_list_args {
@@ -416,60 +395,101 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///
    ///  union rpc_gss3_list_item_u
    ///        switch (rpc_gss3_list_item itype) {
-   ///  case DOI:
-   ///          rpc_gss3_doi    dois<>;
+   ///  case LABEL:
+   ///          rpc_gss3_lable          labels<>;
    ///  case PRIV:
-   ///          string          privs<>;
-   ///  case PRIV_GROUP:
-   ///          string          priv_groups<>;
+   ///          rpc_gss3_list_name      privs<>;
    ///  default:
-   ///          opaque          ext<>;
+   ///          opaque                  ext<>;
    ///  };
    ///
    ///  typedef rpc_gss3_list_item_u rpc_gss3_list_res<>;
     </artwork>
   </figure>
 
-  <t>
-    The rpc_gss_cred_vers_3_t type is used in much the same way that
-    rpc_gss_cred_vers_1_t is used in RPCSEC_GSSv1, that is: as the arm of
-    the rpc_gss_cred_t discriminated union corresponding to version 3
-    (RPCSEC_GSS_VERS_3).  It differs from rpc_gss_cred_vers_1_t in that:
-
-    <list style="letters">
-      <t>
-        the values for gss_proc corresponding to control messages are
-        different,
-      </t>
-
-      <t>
-        the presence of a field indicating the version of
-        RPCSEC_GSS used to established the context handle used, if any.
-      </t>
-    </list>
-  </t>
-
-  <t>
-    RPC data messages using RPCSEC_GSSv3 context handles differ from
-    RPCSEC_GSSv1 only in that the version number used MUST be '3' instead
-    of '1' and, as described above, in that there is one more field in
-    the RPCSEC_GSS header to name the version of RPCSEC_GSS used to
-    establish the context handle used to protect this message.  All other
-    protocol elements from RPCSEC_GSSv1-protected RPC data messages MUST
-    remain the same in v3 as in v1.
-  </t>
-
-  <t>
-    RPCSEC_GSSv3 control messages are the same as RPCSEC_GSSv3 data
-    messages, but with a gss_proc value that indicates a control message
-    is contained in the data payload.
-  </t>
-
-  <section anchor="ss:cm" title="Control messages">
+  <section anchor="ss:nasv" title="New auth_stat values">
 
     <t>
-      There are two RPCSEC_GSSv3 control messages: RPCSEC_GSS3_CREATE and
-      RPCSEC_GSS3_LIST.
+        RPCSEC_GSSv3 requires the addition of several values to the auth_stat
+        enumerated type definition:
+    </t>
+
+    <figure>
+        <artwork>
+           enum auth_stat {
+                   ...
+                   /*
+                    * RPCSEC_GSS errors
+                    */
+                   RPCSEC_GSS3_COMPOUND_PROBEM = <>,
+                   RPCSEC_GSS3_LABEL_PROBLEM = <>,
+                   RPCSEC_GSS3_UNKNOWN_ASSERTION = <>
+                   RPCSEC_GSS3_UNKNOWN_EXTENSION = <>
+                   RPCSEC_GSS3_UNKNOWN_MESSAGE = <>
+           };
+        </artwork>
+    </figure>
+
+    <t>
+        <cref anchor='AI3' source='NW'>
+          fix above into YYY. All the entries are TBD...
+        </cref>
+      </t>
+
+    </section>
+
+  <section anchor="ss:gss3cred" title="RPC message credential and verifier">
+    <t>
+      The rpc_gss_cred_vers_3_t type is used in much the same way that
+      rpc_gss_cred_vers_1_t is used in RPCSEC_GSSv1, that is: as the arm of
+      the rpc_gss_cred_t discriminated union in the RPC message header
+      opaque_auth structure corresponding to version 3
+      (RPCSEC_GSS_VERS_3).  It differs from rpc_gss_cred_vers_1_t in that:
+
+      <list style="letters">
+        <t>
+          the values for gss_proc corresponding to control messages are
+          different.
+        </t>
+
+        <t>
+          the handle field is the RPCSEC_GSSv3 (child) handle, except for
+          the RPCSEC_GSS3_CREATE control message
+          where it is set to the parent context handle.
+        </t>
+        <t>
+         the presence of the handle_version indicating the version of the
+         rpc_gss_cred_vers_1_t handle field.
+        </t>
+
+      </list>
+    </t>
+    <t>
+      For all RPCSEC_GSSv3 data and control  messages, the verifier field in the
+      RPC message header is constructed in the RPCSEC_GSSv1 manner using the
+      parent GSS-API security context.
+    </t>
+  </section>
+
+  <section anchor="ss:cm" title="Control Messages">
+
+    <t>
+      There are three RPCSEC_GSSv3 control messages: RPCSEC_GSS3_CREATE,
+      RPCSEC_GSS3_DESTROY, and RPCSEC_GSS3_LIST.
+    </t>
+
+    <t>
+      RPCSEC_GSSv3 control messages are similar to the RPCSEC_GSSv1
+      RPCSEC_GSS_DESTROY control message (see section 5.4
+      <xref target="RFC2203" />) in that the sequence number
+      in the request must be valid, and the header checksum in the verifier
+      must be valid. In other words, they look a lot like an
+      RPCSEC_GSSv3 data message with the header procedure set to NULLPROC.   
+    </t>
+
+    <t>
+      As in RPCSEC_GSSv1, the RPCSEC_GSSv3 control messages may contain
+      information following the verifier in the body of the NULLPROC procedure.
     </t>
 
     <t>
@@ -495,64 +515,70 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       Specifically the client MUST NOT use rpc_gss_svc_none.
     </t>
 
-    <section anchor="ss:nasv" title="New auth_stat values">
+    <t>
+      For RPCSEC_GSSv3 control messages the rpc_gss_cred_vers_3_t in
+      the RPC message opaque_auth structure is encoded as follows:
 
-      <t>
-        RPCSEC_GSSv3 requires the addition of several values to the auth_stat
-        enumerated type definition:
-      </t>
+      <list style="numbers">
+        <t>
+         the union rpc_gss_cred_t version is set to 3 with the value
+         being of type rpc_gss_cred_vers_3_t instead of rpc_gss_cred_vers_1_t.
+        </t>
 
-      <figure>
-        <artwork>
-           enum auth_stat {
-                   ...
-                   /*
-                    * RPCSEC_GSS errors
-                    */
-                   RPCSEC_GSS3_COMPOUND_PROBEM = <>,
-                   RPCSEC_GSS3_LABEL_PROBLEM = <>,
-                   RPCSEC_GSS3_IDENTITY_PROBLEM = <>
-                   RPCSEC_GSS3_UNKNOWN_ASSERTION = <>
-                   RPCSEC_GSS3_UNKNOWN_EXTENSION = <>
-                   RPCSEC_GSS3_UNKNOWN_MESSAGE = <>
-           };
-        </artwork>
-      </figure>
+        <t>
+         the gss_proc is set to one of RPCSEC_GSS3_CREATE, RPCSEC_GSS3_DESTROY,
+         or RPCSEC_GSS3_LIST.
+        </t>
 
-      <t>
-        <cref anchor='AI2' source='NW'>
-          XXX: fix above into YYY. All the entries are TBD...
-        </cref>
-      </t>
+        <t>
+          the seq_num is a valid sequence number for the context in the
+          handle field.
+        </t>
 
-    </section>
+        <t>
+          the rpc_gss_service_t is one of rpc_gss_svc_integrity,
+          rpc_gss_svc_privacy, or rpc_gss_svc_channel_prot.
+        </t>
+
+        <t>
+         the rpc_gss_cred_vers_3_t handle field is either set to the parent
+         context handle for RPCSEC_GSS3_CREATE, or to the GSS3 child handle for
+         RPCSEC_GSS3_LIST and RPCSEC_GSS3_DESTROY.
+        </t>
+
+        <t>
+         the handle_version is set to the version of the context handle in the
+         handle field.
+        </t>
+      </list>
+    </t>
+    <t>
+      <cref anchor='AI3' source='AA'>
+        Do we need the handle_version field? the handle field context will be
+        cached at client and server and so therefore the version will be known...
+      </cref>
+    </t>
 
     <section anchor="ss:cr" title="Create request">
 
       <t>
-        The RPCSEC_GSS3_CREATE call message consists of inputs to bind into a
-        new RPCSEC_GSSv3 handle.  The context handle used to protect the
-        RPCSEC_GSS3_CREATE call message is termed the "parent" (or "outer")
-        handle.  The reply to this message consists of either an error or a
-        new RPCSEC_GSSv3 handle, termed the "child" handle.
+        As noted in the introduction, RPCSEC_GSSv3 relies on the RPCSEC_GSS
+        version 1 parent context (though version 2 can be used) secure connection
+        to do the actual GSS-API GSS3 security context establishment. As such,
+        the rpc_gss_cred_vers_3_t fields in the RPC Call opaque_auth use the
+        parent context handle and seq_num stream with the handle_version field
+        set to either '1' or '2'.
       </t>
 
       <t>
-        All uses of a child context handle MUST use the GSS-API security
-        context associated with the parent context handle of the
-        RPCSEC_GSS3_CREATE request that produced the child context handle.
-        The child context, however, has its own sequence number space and
-        window, distinct from that of the parent.
-      </t>
-
-      <t>
-        As described in the introduction, the RPCSEC_GSS3_CREATE call message
+        The RPCSEC_GSS3_CREATE call message
         binds one or more items of several kinds into a new RPCSEC_GSSv3
         context handle:
 
         <list style='symbols'>
           <t>
             another RPCSEC_GSS (version 1, 2, or 3) context handle
+            (compound authentication)
           </t>
 
           <t>
@@ -560,18 +586,39 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           </t>
 
           <t>
-            authorization assertions (label, privileges)
+            authorization assertions (labels, privileges)
           </t>
 
           <t>
-            identity assertions
+            extensions (see <xref target="ss:extens" /> )
           </t>
+
         </list>
+        The reply to this message consists of either an error or an
+        rpc_gss3_create_res structure which includes a new RPCSEC_GSSv3
+        handle, termed the "child" which is used for subsequent control
+        and data messages.
+      </t>
+ 
+      <t>
+        Upon successful RPCSEC_GSS3_CREATE, both the client and the server
+        should associate the resultant GSSv3 child context handle with the
+        parent context handle in their GSS context caches so as to be able
+        to reference the parent context given the child context handle.
+      </t>
+      <t>
+        <cref anchor='AI4' source='AA'>
+          Destruction of the parent context => first destroy child handle.
+          IOW fail the RPCSEC_GSS_DESTROY of parent with new
+          RPCSEC_GSS3_CONTEXT_EXISTS error code:
+          What about the lifetime of the GSS3 context. Is this meant to be
+          long lived??
+        </cref>
       </t>
 
+
       <t>
-        Servers MUST either ignore, reject or apply policy to the
-        authorization and identity assertions.  Policies should take into
+        Server policies should take into
         account the identity of the client and/or user as authenticated via
         the GSS-API.  Server implementation and policy MAY result in labels,
         privileges, and identities being mapped to concepts and values that
@@ -582,17 +629,15 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
         <t>
           RPCSEC_GSSv3 allows for compound authentication of client hosts and
-          users to servers.  This is done by using an integrity protected
-          RPCSEC_GSSv3 message of RPCSEC_GSS3_CREATE type which includes a
-          reference to the context handle to bind, a nonce and a MIC of that
-          nonce using the GSS-API security context associated with the named
-          context handle.  We'll term the two context handles "parent" (or
-          "outer") and "inner," and the resulting context handle the "child"
-          handle, where the outer context handle is the context handle
-          providing integrity protection to the RPCSEC_GSS3_CREATE message, and
-          the inner context handle is the one referenced via the
-          compound_binding field of the RPCSEC_GSS3_CREATE arguments structure
-          (rpc_gss3_create_args).
+          users to servers. As in non-compound authentication, there is a parent
+          handle used to protect the RPCSEC_GSS3_CREATE call message,
+          and a resultant RPCSEC_GSSv3 child handle.
+          In addition to the parent handle, the compound authentication create
+          control message has a handle referenced via the compound_binding
+          field of the RPCSEC_GSS3_CREATE arguments structure
+          (rpc_gss3_create_args) termed the "inner" handle, as well as a nonce
+          and a MIC of that nounce created using
+          the GSS-API security context associated with the "inner" handle.
         </t>
 
         <t>
@@ -607,9 +652,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           authority assertions that the server may only grant if a user and a
           client are authenticated together to the server.  Thus a server may
           refuse to grant requested authority to a user acting alone (e.g., via
-          an unprivileged user-space program), but may grant requested
-          authority to a client acting on behalf of a user if the server trusts
-          the client.
+          an unprivileged user-space program), or to a client acting alone
+          (e.g. when a client is acting on behalf of a user) but may grant
+          requested authority to a client acting on behalf of a user if the
+          server identifies the user and trusts the client.
         </t>
 
         <t>
@@ -622,11 +668,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 
         <t>
-          Clients using RPCSEC_GSS context binding MUST use, as the outer
+          Clients using RPCSEC_GSS context binding MUST use, as the parent
           context handle, an RPCSEC_GSS context handle that corresponds to a
           GSS-API security context that authenticates the client host, and for
           the inner context handle it SHOULD use a context handle to
-          authenticates a user.  The reverse (outer handle authenticates user,
+          authenticate a user.  The reverse (parent handle authenticates user,
           inner authenticates client) MUST NOT be used.  Other compounds might
           eventually make sense.
         </t>
@@ -656,8 +702,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
             </t>
             <t>
               channel bindings data are not hashed because the
-              community now agrees that it is the secure channel's responsibility
-              to produce channel bindings data of manageable size.
+              community now agrees that it is the secure channel's
+              responsibility to produce channel bindings data of
+              manageable size.
             </t>
           </list>
         </t>
@@ -672,8 +719,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           Channel binding is accomplished as follows.  The client prefixes the
           channel bindings data octet string with the channel type as described
-          in <xref target="RFC5056" />, then the client calls GSS_GetMIC() to get a MIC of
-          resulting octet string, using the outer RPCSEC_GSS context handle's
+          in <xref target="RFC5056" />, then the client calls GSS_GetMIC()
+          to get a MIC of
+          resulting octet string, using the parent RPCSEC_GSS context handle's
           GSS-API security context.  The MIC is then placed in the
           chan_binding_mic field of RPCSEC_GSS3_CREATE arguments
           (rpc_gss3_create_args).
@@ -706,9 +754,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 
         <t>
-          As per-RPCSEC_GSSv2:
+          As per-RPCSEC_GSSv2 <xref target="RFC1831" />:
 
-          <list style='symbols'>
+          <list>
             <t>
               "Once a successful [channel binding] procedure has been performed
               on an [RPCSEC_GSSv3] context handle, the initiator's
@@ -718,17 +766,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
               rpc_gss_svc_privacy can also be mapped to
               rpc_gss_svc_channel_prot."
             </t>
-
-            <t>
-               ...
-            </t>
           </list>
-        </t>
-
-        <t>
-          <cref anchor='AI3' source='TH'>
-            ...?
-          </cref>
         </t>
 
         <t>
@@ -744,29 +782,32 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       <section anchor="ss:la" title="Label assertions">
 
         <t>
-          RPCSEC_GSSv3 clients MAY assert a security label in some DOI by
+          RPCSEC_GSSv3 clients MAY assert a security label in some LSF by
           binding this assertion into an RPCSEC_GSSv3 context handle.  This is
           done by including an assertion of type rpc_gss3_label in the
           'assertions' field (discriminant: 'LABEL') of the RPCSEC_GSS3_CREATE
-          arguments to the desired DOI and label.
+          arguments to the desired LSF and label.
         </t>
 
         <t>
-          Label encoding is specific to each DOI and not described herein.  DOI
-          encoding is TBD.
-
-          <cref anchor='AI4' source='NW'>
-            [fill in...  Solaris uses integers to name DOIs,
-            and there is an IANA registry of DOIs as 32-bit integers, and IPsec
-            (whence the IANA registry) and CALIPSO use 32-bit integers for DOIs
-            as well.  So a 32-bit unsinged integer seems to be the way to go.
-            Add references... -Nico]
-          </cref>
-
-          <cref anchor='AI4:response' source='TH'>
-            This is just the LNFS format, so update it.
-          </cref>
+          Label encoding is specified to mirror the NFSv4 sec_label attribute
+          described in Section 12.2.2 of <xref target='ref:nfsv4.2' />. The 
+          label format specifier (LFS) is an identifier used by the client to
+          establish the syntactic format of the security label and the
+          semantic meaning of its components. The policy identifier (PI) is
+          an optional part of the definition of an LFS which allows for
+          clients and server to identify specific security policies.
+          The opaque label field of rpc_gss3_label is dependent on the MAC
+          model to interpret and enforce.
         </t>
+
+      <t>
+        <cref anchor='AI5' source='AA'>
+         Check that this Label definition provides all the required pieces to
+         enable full mode when combined with NFSv4.2 LNFS. Specifically, how does
+         the client find out and respond if a server has changed a label. 
+        </cref>
+      </t>
 
         <t>
           If a label itself requires privacy protection (i.e., that the user
@@ -784,168 +825,81 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
         <t>
           Servers that do not support labeling MUST ignore non-critical label
-          assertions.  Servers that do not support the requested DOI MUST either
+          assertions.  Servers that do not support the requested LFS MUST either
           ignore non-critical label assertions or map them to a suitable label
-          in a supported DOI.  Servers that do not support labeling or do not
-          support the requested DOI MUST return an error if the label request
-          is critical.  Servers that support labeling in the requested DOI MAY
+          in a supported LFS.  Servers that do not support labeling or do not
+          support the requested LFS MUST return an error if the label request
+          is critical.  Servers that support labeling in the requested LFS MAY
           map the requested label to different label as a result of server-side
           policy evaluation.
         </t>
       </section>
 
-      <section anchor="ss:pa" title="Privilege assertions">
+      <section anchor="ss:pa" title="Structured privilege assertions">
 
         <t>
-          Privilege assertions are similar to label assertions, except that
-          there is no DOI, and the privileges supported are specified by the
-          RPC application.
+          A structured privilege is an RPC application defined structure that
+          is opaque, and is encoded in the rpc_gss3_privs privilege field.
+          Encoding, server verification and any server policies for structured
+          privileges are described by the RPC application definition.
+          The listname field of rpc_gss3_privs is a description
+          string used to list the privilege.
         </t>
-
         <t>
-          Privileges are encoded US-ASCII strings containing comma-separated
-          privilege names, as well as up to one privilege group name and zero
-          or more exclusions, where each exclusion is a privilege name or
-          privilege group name prefixed with an exclamation point.  Two special
-          privilege group names are defined here: "all" (which represents
-          all possible privileges) and "basic" (which represents privileges
-          normally granted to all users).
+          A successful structured privilege assertion RPCSEC_GSS3_CREATE call
+          must return all accepted privileges in the rpc_gss3_privs
+          granted_assertions field.
         </t>
-
         <t>
-          RPC applications that wish to use this facility must define the set
-          of known privileges, and must specify which privileges are in the
-          "basic" privilege group.  For example, NFSv4 might specify privileges
-          for reading, writing, chowning, linking, etc.
-        </t>
-      </section>
-
-      <section anchor="ss:ia" title="Identity assertions">
-
-        <t>
-          Identity assertions can be used either to modify the set of groups
-          assigned on the server-side to a given user (authenticated by the
-          GSS-API) or to implement an AUTH_SYS-like <xref target="RFC1831" />.
-          In the latter case the client specifies at least a user-name and
-          possibly groups that it thinks the user belongs to.
-        </t>
-
-        <t>
-          Clients may set a username, a group list, and/or lists of groups to
-          be added or removed from the group list that the server would
-          normally use for the given user.
-        </t>
-
-        <t>
-          The server MUST decide whether to accept identity assertions by
-          applying local policy.  Such policies is not described herein.
-          Example policies:
-
-          <list style='symbols'>
-            <t>
-              "always accept identity assertions"
-            </t>
-
-            <t>
-              "always accept identity assertions where the identities are
-              understood"
-            </t>
-
-            <t>
-              "accept identity assertions ... only from trusted clients" (where
-              the identity of the client is taken from the initiator principal
-              of the outer context handle's GSS-API security context, or from
-              the network address of the client...)
-            </t>
-
-            <t>
-              "accept identity assertions ... only from trusted clients where
-              IPsec policy protects this application's packet flows between the
-              clients and this server"
-            </t>
-
-            <t>
-              "accept only removals of groups from a user's group membership
-              list as determined by the server"
-            </t>
-
-            <t>
-              "never accept identity assertions"
-            </t>
-
-            <t>
-              etc.
-            </t>
-          </list>
-        </t>
-
-        <t>
-          Clients may mark an identity assertion as being critical, in which
-          case the server MUST respond with an error if the server does not
-          accept the identity assertion as-is.
-        </t>
-
-        <t>
-          The representation of users and groups is not given here, but is left
-          to the application.  It is expected that RPCSEC_GSSv3 identity
-          assertions in the context of the NFSv4 application would consist of
-          NFSv4 user and group representations as used on the wire in NFSv4
-          access control lists (ACLs).
-        </t>
-      </section>
-
-      <section anchor="ss:sa" title="Server assertions">
-
-        <t>
-          Servers MAY inform clients of assertions were granted by setting the
-          'granted_assertions' field of the RPCSEC_GSS3_CREATE reply.
-        </t>
-
-        <t>
-          The protocol provides a field ('server_assertions') for servers to
-          make assertions about themselves.  At this time there is not much use
-          for this field, though servers MAY assert a single security label,
-          indicating that all contents on the server is at that label.  The
-          client MUST, of course, either evaluate or ignore any server-side
-          assertions.
+          Section 3.4.1.2. "Inter-Server Copy with RPCSEC_GSSv3"
+          of <xref target='ref:nfsv4.2' /> shows an example of structured
+          privilege definition and use.
         </t>
       </section>
     </section>
 
-    <section anchor="ss:chd" title="Context handle destruction">
+    <section anchor="ss:chd" title="Destruction request">
 
       <t>
-        The RPCSEC_GSS3_DESTROY procedure is the same as for RPCSEC_GSSv1,
-        but with the version 3 header.
+        The RPCSEC_GSS3_DESTROY control message is the same as the RPCSEC_GSSv1
+        RPCSEC_GSS_DESTROY control message, but with the version 3 header.
+        Specifically, the rpc_gss_cred_vers_3_t fields in the RPC Call
+        opaque_auth use the GSS3 context handle and seq_num stream with the
+        handle_version field set to '3'. 
+	As with all RPCSEC_GSSv3 messages, the header checksum uses the parent
+        context, and needs to be valid.
       </t>
+      <t>
+        The server sends a response as it would to a data request.  The client
+        and server must then destroy the context for the session.
+      </t>
+
     </section>
 
     <section anchor="ss:lr" title="List request">
 
       <t>
-        The RPCSEC_GSS3_LIST call message consists of a single integer
+        The RPCSEC_GSS3_LIST control message is similar to RPCSEC_GSS3_DESTROY
+        message.  Specifically, the rpc_gss_cred_vers_3_t fields in the RPC Call
+        opaque_auth use the GSS3 context handle and seq_num stream with the
+        handle_version field set to '3'. 
+	As with all RPCSEC_GSSv3 messages, the header checksum uses the parent
+        context, and needs to be valid.
+      </t>
+      <t>
+        The RPCSEC_GSS3_LIST control message consists of a single integer
         indicating what should be listed, and the reply consists of an error
         or the requested list.
+        The client may list LFSs or structured privilege listnames.
       </t>
 
       <t>
-        The client may list DOIs, privilege names, or privilege group names.
-      </t>
-
-      <t>
-        The result is an opaque octet string containing a list of DOIs
-        [encoding TBD] or a US-ASCII string containing a comma-separated
-        list of privilege names or privilege group names.
+        The result is an opaque octet string containing a list of LFSs
+        [encoding TBD] or a list of active structured privileges [encoding TBD].
       </t>
     </section>
 
     <section anchor="ss:extens" title="Extensibility">
-
-      <t>
-        Assertion types may be added in the future by adding arms to the
-        'rpc_gss3_assertion_u' union.  Every assertion has a 'critical' flag
-        that can be used to indicate criticality.
-      </t>
 
       <t>
         New fields may be added through the 'extensions' typed hole.  All
@@ -953,14 +907,43 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </t>
 
       <t>
-        New message types may be added.
+        <cref anchor='AI6' source='AA'>
+          Should we keep the extensions types hole? I think not...
+        </cref>
       </t>
 
       <t>
-        Clients receiving unknown critical server assertions MUST destroy the
-        established RPCSEC_GSSv3 context handle.  Servers receiving unknown
-        critical client assertions or unknown RPCSEC_GSS_v3 extensions MUST
-        return an error.
+        Assertion types may be added in the future by adding arms to the
+        'rpc_gss3_assertion_u' union.  Every assertion has a 'critical' flag
+        that can be used to indicate criticality.
+        Other assertion types are described elsewhere and include:
+
+        <list style='symbols'>
+          <t>
+            Client-side assertions of identity:
+
+            <list style='symbols'>
+              <t>
+                Primary client/user identity
+              </t>
+
+              <t>
+                Supplementary group memberships of the client/user, including
+                support for specifying deltas to the membership list as seen on
+                the server.
+              </t>
+            </list>
+          </t>
+        </list>
+      </t>
+
+      <t>
+        New control message types may be added.
+      </t>
+
+      <t>
+        Servers receiving unknown critical client assertions or unknown
+        RPCSEC_GSS_v3 extensions MUST return an error.
       </t>
 
       <t>
@@ -969,121 +952,49 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </t>
     </section>
   </section>
-</section>
+  <section anchor="ss:dm" title="Data Messages">
 
-<section anchor="sec:pairfn" title="Privileges and identity representation for NFSv4">
+    <t>
+      RPCSEC_GSS3_DATA messages differ from from RPCSEC_GSSv1 data messages in
+      that the version number used MUST be '3' instead of '1'. As noted in
+      <xref target="ss:gss3cred" /> the RPCSEC_GSSv3 context handle is used
+      along with it's sequence number stream.
+    </t>
 
-  <t>
-    The representation of users and groups for use in identity assertions
-    in RPCSEC_GSSv3 SHALL be the same as the user and group
-    representations used by NFSv4 for access control list subjects on the
-    wire, cast as an octet string ("opaque").
-  </t>
+    <t>
+      For RPCSEC_GSSv3 data messages the rpc_gss_cred_vers_3_t in
+      the RPC message opaque_auth structure is encoded as follows:
 
-  <t>
-    The following privileges are defined for use with the NFSv4 protocol:
+      <list style="numbers">
+        <t>
+         the union rpc_gss_cred_t version is set to 3 with the value
+         being of type rpc_gss_cred_vers_3_t instead of rpc_gss_cred_vers_1_t.
+        </t>
 
-    <list style='hanging'>
-      <t hangText="file_chown">
-        Generally allows the caller to change a file's owner
-        regardless of who owns the file.
-      </t>
+        <t>
+         the gss_proc is set to RPCSEC_GSS3_DATA 
+        </t>
 
-      <t hangText="file_chown_self">
-        Generally allows the caller to change the owner of a
-        file it owns.
-      </t>
+        <t>
+          the seq_num is a valid GSS3 context (child context) sequence number.
+        </t>
 
-      <t hangText="file_dac_execute">
-        Generally allows the caller to read any file for
-        execution.
-      </t>
+        <t>
+          just as in RPCSEC_GSSv1, the rpc_gss_service_t is one of
+          rpc_gss_svc_none, rpc_gss_svc_integrity, rpc_gss_svc_privacy, or
+          rpc_gss_svc_channel_prot.
+        </t>
 
-      <t hangText="file_dac_read">
-        Generally allows the caller to read any file or
-        directory.
-      </t>
+        <t>
+          the handle field is set to the (child) RPCSEC_GSSv3 context handle
+        </t>
 
-      <t hangText="file_dac_search">
-        Generally allows the caller to search any directory.
-      </t>
-
-      <t hangText="file_dac_write">
-        Generally allows the caller to write to any file (or
-        create/delete/link objects in directories).
-      </t>
-
-      <t hangText="file_link_any">
-        Generally allows the caller to create hardlinks to
-        files not owned by the caller.
-      </t>
-
-      <t hangText="file_owner">
-        Generally allows the caller to modify the access,
-        modification and other timestamps of a filesystem object, as well
-        as its permissions and ACL.
-      </t>
-
-      <t hangText="file_setid">
-        Generally allows the caller to set the set-user-ID and
-        set-group-ID bits of a file.
-      </t>
-
-      <t hangText="file_downgrade_sl">
-        Generally allows the caller to downgrade the
-        security label of a filesystem object.
-      </t>
-
-      <t hangText="file_update_sl">
-        Generally allows the caller to upgrade the security
-        label of a filesystem object.
-      </t>
-    </list>
-  </t>
-
-  <t>
-    <cref anchor='AI5' source='NW'>
-      [What about NFSv3?  The representation of privs would be the same for
-      v3 as for v4, though there'd be no privs for dealing with labels
-      (file_downgrade_sl and file_update_sl).  And the representation of
-      users/groups would NFSv3's representation thereof.  But should we
-      bother to specify this? -Nico]
-    </cref>
-
-    <cref anchor='AI5:resp' source='TH'>
-      Need a use case to justify v3 development.
-    </cref>
-  </t>
-
-  <t>
-    <cref anchor='AI6' source='NW'>
-      [Also, this is derived from Solaris' notion of privileges.  We should
-      look at how well this scheme relates to other operating systems as
-      NFSv4 clients and servers. -Nico]
-    </cref>
-
-    <cref anchor='AI6:resp' source='TH'>
-      On the radar.
-    </cref>
-  </t>
-
-  <t>
-    The contents of the 'basic' privilege set is not defined herein.
-    Note that 'file_link_any' and 'file_chown_self' may be present in the
-    server's notion of the basic privilege set.
-  </t>
-
-  <t>
-    The NFSv4-specific privileges may be limited by the server in ways
-    not specified above.  For example, the server may deny access for
-    certain operations that would normally be granted given the granted
-    assertion of a given privilege (e.g., "no one may write to files
-    owned by such and such user"), or the server may require that all
-    privileges be asserted (and granted, of course) in order to allow
-    certain operations (e.g., "all privileges are required in order to
-    write to files owned by such and such user, not just
-    file_dac_write").
-  </t>
+        <t>
+         the handle_version is set to the version of the parent context handle
+        </t>
+      </list>
+    </t>
+  </section>
 </section>
 
 <section anchor="sec:security" title="Security Considerations">
@@ -1121,27 +1032,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
 
   <t>
-    The RPCSEC_GSSv3 protocol also provides for a replacement of the old
-    AUTH_SYS RPC authentication flavor.  AUTH_SYS relies on "privileged
-    port numbers" for "authentication," and was quite limited in what
-    assertions it supported and incompatible with NFSv4 representations
-    of identity.  To replace AUTH_SYS with RPCSEC_GSSv3 simply use a GSS-
-    API mechanism to authenticate the client (but not the user) and let
-    the client assert the user's identity.  This is more secure than
-    AUTH_SYS in that at least the client can be strongly authenticated
-    using GSS-API mechanisms, and it is more functional than AUTH_SYS in
-    that identity representations are defined by the application layer.
-  </t>
-
-  <t>
-    It is possible that a GSS-API mechanism that does not provide any
-    security services could be created so as to make it possible to
-    replace AUTH_SYS with RPCSEC_GSSv3 while retaining the same
-    privileged port semantics.  Such a mechanism is out of scope for this
-    document and would have its own security considerations.
-  </t>
-
-  <t>
     There may be interactions with NFSv4's callback security scheme and
     NFSv4.1's GSS-API "SSV" mechanisms.  Specifically, the NFSv4 callback
     scheme requires that the server initiate GSS-API security contexts,
@@ -1157,9 +1047,29 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     use RPCSEC_GSS context handles which authenticate the client to
     protect any callbacks relating to server state initiated by RPCs
     protected by RPCSEC_GSSv3 contexts.
-
+  </t>
+  <t>
     <cref anchor='AI7' source='NW'>
       [Add text about interaction with GSS-SSV...]
+    </cref>
+  </t>
+  <t>
+    <cref anchor='AI8' source='AA'>
+      I see no reason to use RPCSEC_GSSv3 contexts for NFSv4.x back channel.
+    </cref>
+  </t>
+  <t>
+    <cref>
+      Since GSS3 requires an RPCSEC_GSSv1 or v2 context handle to establish a
+      GSS3 context, SSV can not be used as this draft is written.
+    </cref>
+  </t>
+  <t>
+    <cref anchor='AI9' source='AA'>
+      AFAICS the reason to use SSV is to avoid using a client machine credential
+      which means compound authentication can not be used.
+      Since GSS3 requires an RPCSEC_GSSv1 or v2 context handle to establish a
+      GSS3 context, SSV can not be used as the parent context for GSSv3.
     </cref>
   </t>
 </section>

@@ -6,7 +6,7 @@ MONTH=`date +%B`
 DAY=`date +%d`
 PREVVERS=04
 VERS=05
-XML2RFC=xml2rfc.tcl
+XML2RFC=/Users/andros/ietf/xml2rfc-1.36/xml2rfc.tcl
 
 autogen/%.xml : %.x
 	@mkdir -p autogen
