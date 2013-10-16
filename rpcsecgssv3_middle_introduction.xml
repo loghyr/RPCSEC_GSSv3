@@ -302,7 +302,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          unsigned int            seq_num;
    ///          rpc_gss_service_t       service;
    ///          opaque                  handle<>;
-   ///          unsigned int            handle_version;
    ///  };
    ///
    ///  const RPCSEC_GSS_VERS_1 = 1;
@@ -457,10 +456,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           the RPCSEC_GSS3_CREATE control message
           where it is set to the parent context handle.
         </t>
-        <t>
-         the presence of the handle_version indicating the version of the
-         rpc_gss_cred_vers_1_t handle field.
-        </t>
 
       </list>
     </t>
@@ -546,17 +541,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
          RPCSEC_GSS3_LIST and RPCSEC_GSS3_DESTROY.
         </t>
 
-        <t>
-         the handle_version is set to the version of the context handle in the
-         handle field.
-        </t>
       </list>
-    </t>
-    <t>
-      <cref anchor='AI3' source='AA'>
-        Do we need the handle_version field? the handle field context will be
-        cached at client and server and so therefore the version will be known...
-      </cref>
     </t>
 
     <section anchor="ss:cr" title="Create request">
@@ -566,8 +551,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         version 1 parent context (though version 2 can be used) secure connection
         to do the actual GSS-API GSS3 security context establishment. As such,
         the rpc_gss_cred_vers_3_t fields in the RPC Call opaque_auth use the
-        parent context handle and seq_num stream with the handle_version field
-        set to either '1' or '2'.
+        parent context handle and seq_num stream.
       </t>
 
       <t>
@@ -864,8 +848,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         The RPCSEC_GSS3_DESTROY control message is the same as the RPCSEC_GSSv1
         RPCSEC_GSS_DESTROY control message, but with the version 3 header.
         Specifically, the rpc_gss_cred_vers_3_t fields in the RPC Call
-        opaque_auth use the GSS3 context handle and seq_num stream with the
-        handle_version field set to '3'. 
+        opaque_auth use the GSS3 context handle and seq_num stream.
 	As with all RPCSEC_GSSv3 messages, the header checksum uses the parent
         context, and needs to be valid.
       </t>
@@ -881,8 +864,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       <t>
         The RPCSEC_GSS3_LIST control message is similar to RPCSEC_GSS3_DESTROY
         message.  Specifically, the rpc_gss_cred_vers_3_t fields in the RPC Call
-        opaque_auth use the GSS3 context handle and seq_num stream with the
-        handle_version field set to '3'. 
+        opaque_auth use the GSS3 context handle and seq_num stream.
 	As with all RPCSEC_GSSv3 messages, the header checksum uses the parent
         context, and needs to be valid.
       </t>
@@ -989,9 +971,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           the handle field is set to the (child) RPCSEC_GSSv3 context handle
         </t>
 
-        <t>
-         the handle_version is set to the version of the parent context handle
-        </t>
       </list>
     </t>
   </section>
