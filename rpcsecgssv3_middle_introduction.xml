@@ -81,9 +81,9 @@
   </t>
 
   <t>
-    We also add an option for enumerating active server-side privileges and
-    supported label format specifiers (LFS).  The LFS and Label Format
-    Registry are described in detail in <xref target='ref:lfsreg' />.
+    We add an option for enumerating server supported label format specifiers
+    (LFS).  The LFS and Label Format Registry are described in detail
+    in <xref target='ref:lfsreg' />.
   </t>
 
   <t>
@@ -97,20 +97,34 @@
       </t>
 
       <t>
-        The server issues a "child" RPCSEC_GSSv3 handle, but the
-        underlying GSS-API security context for the parent handle is used
-        in all subsequent exchanges using the child handle. This works
-        because the RPCSEC_GSS handle is included in the integrity
-        protected RPCSEC_GSS auth/verifier header for all versions of
-        RPCSEC_GSS.
-        The child context, however, has its own sequence number space and
-        window, distinct from that of the parent.
+        The server issues a "child" RPCSEC_GSSv3 handle which uses the
+        underlying GSS-API security context of the parent handle 
+        in all subsequent exchanges that uses the child handle.
+      </t>
+
+      <t>
+        The child handle, however, has its own sequence number space
+        distinct from that of the parent.
       </t>
     </list>
   </t>
       <t>
         <cref anchor='AI1' source='AA'>
-         RFC22203 states that when data integrity is used, the seq_num in the
+	 I removed the "child has a window distinct from that of the parent"
+         because
+         RFC2203 states: "   In a successful response, the seq_window field
+         is set to the sequence window length supported by the server for
+         this context.  This window specifies the maximum number of client
+         requests that may be outstanding for this context."
+         If we want a distinct window, we will need to add that to the
+         rpc_gss3_create_res so that the server can set it.
+         I see no point - just use the parent window.
+        </cref>
+      </t>
+
+      <t>
+        <cref anchor='AI2' source='AA'>
+         RFC2203 states that when data integrity is used, the seq_num in the
          rpc_gss_data_t must be the same as in the credential. This means that
          using data integrity with GSS3 context's can not simply construct it
          using the parent context as the seq_num must be from the GSS3 context. 
@@ -151,7 +165,7 @@
       guest mode or full mode labeled NFS.
     </t>
       <t>
-        <cref anchor='AI2' source='AA'>
+        <cref anchor='AI3' source='AA'>
           check that this language states what NFSv4.2 labeled
           NFS problem we are really solving. (setting labels on the server) 
         </cref>
@@ -343,10 +357,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          opaque          label<>;
    ///  };
    ///
-   ///  typedef string rpc_gss3_list_name<>;
    ///  struct rpc_gss3_privs {
-   ///          rpc_gss3_list_name      listname;   
-   ///          opaque                  privilege<>;
+   ///          string          name; /* human readable */  
+   ///          opaque          privilege<>;
    ///  };
    ///
    ///  enum rpc_gss3_assertion_type {
@@ -358,7 +371,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///        switch (rpc_gss3_assertion_type atype) {
    ///  case LABEL:
    ///          rpc_gss3_label  label;
-   ///  case PRIVILEGES:
+   ///  case PRIVS:
    ///          rpc_gss3_privs  privs;
    ///  default:
    ///          opaque          ext<>;
@@ -385,7 +398,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///
    ///  enum rpc_gss3_list_item {
    ///          LABEL = 0,
-   ///          PRIV = 1,
    ///  };
    ///
    ///  struct rpc_gss3_list_args {
@@ -396,8 +408,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///        switch (rpc_gss3_list_item itype) {
    ///  case LABEL:
    ///          rpc_gss3_lable          labels<>;
-   ///  case PRIV:
-   ///          rpc_gss3_list_name      privs<>;
    ///  default:
    ///          opaque                  ext<>;
    ///  };
@@ -430,7 +440,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </figure>
 
     <t>
-        <cref anchor='AI3' source='NW'>
+        <cref anchor='AI4' source='NW'>
           fix above into YYY. All the entries are TBD...
         </cref>
       </t>
@@ -537,8 +547,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
         <t>
          the rpc_gss_cred_vers_3_t handle field is either set to the parent
-         context handle for RPCSEC_GSS3_CREATE, or to the GSS3 child handle for
-         RPCSEC_GSS3_LIST and RPCSEC_GSS3_DESTROY.
+         context handle for RPCSEC_GSS3_CREATE and RPCSEC_GSS3_LIST, or to
+         the GSS3 child handle for RPCSEC_GSS3_DESTROY.
         </t>
 
       </list>
@@ -548,10 +558,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
       <t>
         As noted in the introduction, RPCSEC_GSSv3 relies on the RPCSEC_GSS
-        version 1 parent context (though version 2 can be used) secure connection
-        to do the actual GSS-API GSS3 security context establishment. As such,
-        the rpc_gss_cred_vers_3_t fields in the RPC Call opaque_auth use the
-        parent context handle and seq_num stream.
+        version 1 parent context (though version 2 can be used) secure
+        connection to do the actual GSS-API GSS3 security context establishment.
+        As such, for the RPCSEC_GSS3_CREATE request, the rpc_gss_cred_vers_3_t
+        fields in the RPC Call opaque_auth use the parent context handle and
+        seq_num stream.
       </t>
 
       <t>
@@ -591,22 +602,23 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         to reference the parent context given the child context handle.
       </t>
       <t>
-        <cref anchor='AI4' source='AA'>
+        <cref anchor='AI5' source='AA'>
           Destruction of the parent context => first destroy child handle.
           IOW fail the RPCSEC_GSS_DESTROY of parent with new
-          RPCSEC_GSS3_CONTEXT_EXISTS error code:
-          What about the lifetime of the GSS3 context. Is this meant to be
-          long lived??
+          RPCSEC_GSS3_CONTEXT_EXISTS error code OR upon the destruction of
+          the parent context destroy any associated RPCSEC_GSSv3 contexts
+          OR.....
         </cref>
       </t>
 
 
       <t>
-        Server policies should take into
-        account the identity of the client and/or user as authenticated via
-        the GSS-API.  Server implementation and policy MAY result in labels,
+        Server implementation and policy MAY result in labels,
         privileges, and identities being mapped to concepts and values that
         are local to the server.
+        Server policies should take into
+        account the identity of the client and/or user as authenticated via
+        the GSS-API.  
       </t>
 
       <section anchor="ss:ca" title="Compound authentication">
@@ -614,7 +626,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           RPCSEC_GSSv3 allows for compound authentication of client hosts and
           users to servers. As in non-compound authentication, there is a parent
-          handle used to protect the RPCSEC_GSS3_CREATE call message,
+          handle used to protect the RPCSEC_GSS3_CREATE call message
           and a resultant RPCSEC_GSSv3 child handle.
           In addition to the parent handle, the compound authentication create
           control message has a handle referenced via the compound_binding
@@ -622,13 +634,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           (rpc_gss3_create_args) termed the "inner" handle, as well as a nonce
           and a MIC of that nounce created using
           the GSS-API security context associated with the "inner" handle.
-        </t>
-
-        <t>
-          All uses of a child context handle that is bound to an inner context
-          MUST be treated as speaking for the initiator principal (as modified
-          by any assertions in the RPCSEC_GSS3_CREATE message) of the inner
-          context handle's GSS-API security context.
         </t>
 
         <t>
@@ -666,9 +671,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           context MUST be treated by servers as authenticating the GSS-API
           initiator principal authenticated by the inner context handle's GSS-
           API security context.  This principal may be mapped to a server-side
-          notion of user or principal as modified by any identity assertions by
-          the client in the same RPCSEC_GSS3_CREATE request that the server
-          accepts.
+          notion of user or principal.
         </t>
       </section>
 
@@ -786,10 +789,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 
       <t>
-        <cref anchor='AI5' source='AA'>
+        <cref anchor='AI6' source='AA'>
          Check that this Label definition provides all the required pieces to
-         enable full mode when combined with NFSv4.2 LNFS. Specifically, how does
-         the client find out and respond if a server has changed a label. 
+         enable full mode when combined with NFSv4.2 LNFS. Specifically, how
+         does the client find out and respond if a server has changed a label. 
         </cref>
       </t>
 
@@ -826,12 +829,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           is opaque, and is encoded in the rpc_gss3_privs privilege field.
           Encoding, server verification and any server policies for structured
           privileges are described by the RPC application definition.
-          The listname field of rpc_gss3_privs is a description
-          string used to list the privilege.
         </t>
         <t>
           A successful structured privilege assertion RPCSEC_GSS3_CREATE call
-          must return all accepted privileges in the rpc_gss3_privs
+          must return all granted privileges in the rpc_gss3_privs
           granted_assertions field.
         </t>
         <t>
@@ -872,12 +873,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         The RPCSEC_GSS3_LIST control message consists of a single integer
         indicating what should be listed, and the reply consists of an error
         or the requested list.
-        The client may list LFSs or structured privilege listnames.
+        The client may query the server to list available LFSs.
       </t>
 
       <t>
         The result is an opaque octet string containing a list of LFSs
-        [encoding TBD] or a list of active structured privileges [encoding TBD].
+        [encoding TBD].
       </t>
     </section>
 
@@ -889,7 +890,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </t>
 
       <t>
-        <cref anchor='AI6' source='AA'>
+        <cref anchor='AI7' source='AA'>
           Should we keep the extensions types hole? I think not...
         </cref>
       </t>
@@ -1028,12 +1029,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     protected by RPCSEC_GSSv3 contexts.
   </t>
   <t>
-    <cref anchor='AI7' source='NW'>
+    <cref anchor='AI8' source='NW'>
       [Add text about interaction with GSS-SSV...]
     </cref>
   </t>
   <t>
-    <cref anchor='AI8' source='AA'>
+    <cref anchor='AI9' source='AA'>
       I see no reason to use RPCSEC_GSSv3 contexts for NFSv4.x back channel.
     </cref>
   </t>
@@ -1044,7 +1045,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </cref>
   </t>
   <t>
-    <cref anchor='AI9' source='AA'>
+    <cref anchor='AI10' source='AA'>
       AFAICS the reason to use SSV is to avoid using a client machine credential
       which means compound authentication can not be used.
       Since GSS3 requires an RPCSEC_GSSv1 or v2 context handle to establish a
