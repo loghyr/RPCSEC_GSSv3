@@ -332,12 +332,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///
    ///  const MAXSEQ = 0x80000000;
    ///
-   ///  struct rpc_gss3_extension {
-   ///          int     type;
-   ///          bool    critical;
-   ///          opaque  data<>;
-   ///  };
-   ///
    ///  struct rpc_gss3_gss_binding {
    ///          unsigned int    vers;
    ///          opaque          handle<>;
@@ -386,14 +380,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          rpc_gss3_gss_binding    *compound_binding;
    ///          rpc_gss3_chan_binding   *chan_binding_mic;
    ///          rpc_gss3_assertion      assertions<>;
-   ///          rpc_gss3_extension      extensions<>;
    ///  };
    ///
    ///  struct rpc_gss3_create_res {
    ///          opaque                  handle<>;
    ///          rpc_gss3_chan_binding   *chan_binding_mic;
    ///          rpc_gss3_assertion      granted_assertions<>;
-   ///          rpc_gss3_extension      granted_extensions<>;
    ///  };
    ///
    ///  enum rpc_gss3_list_item {
@@ -582,10 +574,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
           <t>
             authorization assertions (labels, privileges)
-          </t>
-
-          <t>
-            extensions (see <xref target="ss:extens" /> )
           </t>
 
         </list>
@@ -885,17 +873,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     <section anchor="ss:extens" title="Extensibility">
 
       <t>
-        New fields may be added through the 'extensions' typed hole.  All
-        such extensions have a 'critical' flag.
-      </t>
-
-      <t>
-        <cref anchor='AI7' source='AA'>
-          Should we keep the extensions types hole? I think not...
-        </cref>
-      </t>
-
-      <t>
         Assertion types may be added in the future by adding arms to the
         'rpc_gss3_assertion_u' union.  Every assertion has a 'critical' flag
         that can be used to indicate criticality.
@@ -925,13 +902,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </t>
 
       <t>
-        Servers receiving unknown critical client assertions or unknown
-        RPCSEC_GSS_v3 extensions MUST return an error.
-      </t>
-
-      <t>
-        There is no IANA or other registry for RPCSEC_GSSv3 extensions.  All
-        extensions MUST be done by IETF Protocol Action.
+        Servers receiving unknown critical client assertions MUST return
+        an error.
       </t>
     </section>
   </section>
@@ -999,8 +971,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
 
   <t>
-    RPCSEC_GSSv3 supports a notion of critical assertions (and
-    extensions), but there's no need for peers to tell each other what
+    RPCSEC_GSSv3 supports a notion of critical assertions
+    but there's no need for peers to tell each other what
     assertions were granted, or what they were mapped to.
   </t>
 
