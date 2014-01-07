@@ -132,10 +132,22 @@
       </t>
 
   <t>
-    This means that RPCSEC_GSSv3 depends on RPCSEC_GSS versions 1 and/or
-    2 for actual GSS-API security context establishment.  This keeps the
+    This means that RPCSEC_GSSv3 depends on an existing parent RPCSEC_GSSv1 or
+    RPCSEC_GSSv2 context for actual GSS-API security context establishment.
+    This keeps the
     specification of RPCSEC_GSSv3 simple by avoiding the need to
     duplicate the core functionality of RPCSEC_GSS version 1.
+    This also means that an RPCSEC_GSSv3 context MUST be destroyed prior
+    to it's parent context being destroyed.
+  </t>
+  <t>
+    <cref anchor='AI3' source='AA'>
+      Destruction of the parent context => first destroy child handle.
+      IOW fail the RPCSEC_GSS_DESTROY of parent with new
+      RPCSEC_GSS3_CONTEXT_EXISTS error code OR upon the destruction of
+      the parent context destroy any associated RPCSEC_GSSv3 contexts
+      OR.....
+    </cref>
   </t>
 
   <section anchor="ss:aor" title="Applications of RPCSEC_GSSv3">
@@ -165,7 +177,7 @@
       guest mode or full mode labeled NFS.
     </t>
       <t>
-        <cref anchor='AI3' source='AA'>
+        <cref anchor='AI4' source='AA'>
           check that this language states what NFSv4.2 labeled
           NFS problem we are really solving. (setting labels on the server) 
         </cref>
@@ -431,10 +443,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </figure>
 
     <t>
-        <cref anchor='AI4' source='NW'>
+        <cref anchor='AI5' source='NW'>
           fix above into YYY. All the entries are TBD...
         </cref>
-        <cref anchor='AI5' source='AA'>
+        <cref anchor='AI6' source='AA'>
           The compound authentication problems are: can't find the handle plus
 	  handle version on the target, or the MIC of the nounce does not
 	  match. Both of these errors already have auth_stat entries:
@@ -595,16 +607,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         parent context handle in their GSS context caches so as to be able
         to reference the parent context given the child context handle.
       </t>
-      <t>
-        <cref anchor='AI6' source='AA'>
-          Destruction of the parent context => first destroy child handle.
-          IOW fail the RPCSEC_GSS_DESTROY of parent with new
-          RPCSEC_GSS3_CONTEXT_EXISTS error code OR upon the destruction of
-          the parent context destroy any associated RPCSEC_GSSv3 contexts
-          OR.....
-        </cref>
-      </t>
-
 
       <t>
         Server implementation and policy MAY result in labels,
