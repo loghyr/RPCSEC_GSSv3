@@ -33,7 +33,6 @@
     for compound authentication.
   </t>
 
-
   <t>
    Because the design of RPCSEC_GSSv3 relies on either RPCSEC_GSS version 1
    (though version 2 can be used) to do the actual GSS-API security context
@@ -44,23 +43,19 @@
 
   <t>
     We therefore describe a new version of RPCSEC_GSS that allows for the
-    following:
+    following client-side assertions of authority:
 
     <list style='symbols'>
       <t>
-        Client-side assertions of authority:
-
-        <list style='symbols'>
-          <t>
-            Security labels for multi-level, type enforcement, and other
-            labeled security models. See <xref target='ref:rh_mls' />,
-            <xref target='DTOS' />, <xref target='SENFSV3' />,
-            <xref target='ref:nfsv4.2' /> and <xref target='ref:lnfs_req' />.
-          </t>
-          <t>
-            Application-specific structured privileges. For an example
-            see server-side copy <xref target='ref:nfsv4.2' />.
-          </t>
+        Security labels for multi-level, type enforcement, and other
+        labeled security models. See <xref target='ref:rh_mls' />,
+        <xref target='DTOS' />, <xref target='SENFSV3' />,
+        <xref target='ref:nfsv4.2' /> and <xref target='ref:lnfs_req' />.
+      </t>
+      <t>
+        Application-specific structured privileges. For an example
+        see server-side copy <xref target='ref:nfsv4.2' />.
+      </t>
       <t>
         Compound authentication of the client host and user to the server
         done by binding two RPCSEC_GSS handles.
@@ -68,8 +63,6 @@
 
       <t>
         Simplified channel binding. 
-      </t>
-        </list>
       </t>
     </list>
   </t>
@@ -163,9 +156,8 @@
           authentication;
         </t>
         <t>
-          compound client host & user authentication [+
-          critical structured privilege assertions] used in inter-server
-          server-side copy;
+          inter-server server-side copy: compound client host & user
+          authentication [+ critical structured privilege assertions]
         </t>
       </list>
     </t>
@@ -197,7 +189,7 @@
   </section>
 </section>
 
-<section anchor="sec:protocol" title="The RPCSEC_GSSv3 protocol">
+<section anchor="sec:protocol" title="The RPCSEC_GSSv3 Protocol">
 
   <t>
     This document contains the  External Data Representation (XDR)
@@ -420,7 +412,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </artwork>
   </figure>
 
-  <section anchor="ss:nasv" title="New auth_stat values">
+  <section anchor="ss:nasv" title="New auth_stat Values">
 
     <t>
         RPCSEC_GSSv3 requires the addition of several values to the auth_stat
@@ -457,7 +449,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
     </section>
 
-  <section anchor="ss:gss3cred" title="RPC message credential and verifier">
+  <section anchor="ss:gss3cred" title="RPC Message Credential and Verifier">
     <t>
       The rpc_gss_cred_vers_3_t type is used in much the same way that
       rpc_gss_cred_vers_1_t is used in RPCSEC_GSSv1, that is: as the arm of
@@ -473,7 +465,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
         <t>
           the handle field is the RPCSEC_GSSv3 (child) handle, except for
-          the RPCSEC_GSS3_CREATE control message
+          the RPCSEC_GSS3_CREATE and RPCSEC_GSS3_LIST control messages
           where it is set to the parent context handle.
         </t>
 
@@ -534,7 +526,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       For RPCSEC_GSSv3 control messages the rpc_gss_cred_vers_3_t in
       the RPC message opaque_auth structure is encoded as follows:
 
-      <list style="numbers">
+      <list style='symbols'>
         <t>
          the union rpc_gss_cred_t version is set to 3 with the value
          being of type rpc_gss_cred_vers_3_t instead of rpc_gss_cred_vers_1_t.
@@ -564,7 +556,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </list>
     </t>
 
-    <section anchor="ss:cr" title="Create request">
+    <section anchor="ss:cr" title="Create Request">
 
       <t>
         As noted in the introduction, RPCSEC_GSSv3 relies on the RPCSEC_GSS
@@ -617,7 +609,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         the GSS-API.  
       </t>
 
-      <section anchor="ss:ca" title="Compound authentication">
+      <section anchor="ss:ca" title="Compound Authentication">
 
         <t>
           RPCSEC_GSSv3 allows for compound authentication of client hosts and
@@ -671,7 +663,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
       </section>
 
-      <section anchor="ss:cb" title="Channel binding">
+      <section anchor="ss:cb" title="Channel Binding">
 
         <t>
           RPCSEC_GSSv3 provides a different way to do channel binding than
@@ -762,7 +754,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
       </section>
 
-      <section anchor="ss:la" title="Label assertions">
+      <section anchor="ss:la" title="Label Assertions">
 
         <t>
           RPCSEC_GSSv3 clients MAY assert a security label in some LSF by
@@ -818,7 +810,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
       </section>
 
-      <section anchor="ss:pa" title="Structured privilege assertions">
+      <section anchor="ss:pa" title="Structured Privilege Assertions">
 
         <t>
           A structured privilege is an RPC application defined structure that
@@ -839,7 +831,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </section>
     </section>
 
-    <section anchor="ss:chd" title="Destruction request">
+    <section anchor="ss:chd" title="Destruction Request">
 
       <t>
         The RPCSEC_GSS3_DESTROY control message is the same as the RPCSEC_GSSv1
@@ -856,12 +848,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
     </section>
 
-    <section anchor="ss:lr" title="List request">
+    <section anchor="ss:lr" title="List Request">
 
       <t>
-        The RPCSEC_GSS3_LIST control message is similar to RPCSEC_GSS3_DESTROY
+        The RPCSEC_GSS3_LIST control message is similar to RPCSEC_GSS3_CREATE
         message.  Specifically, the rpc_gss_cred_vers_3_t fields in the RPC Call
-        opaque_auth use the GSS3 context handle and seq_num stream.
+        opaque_auth use the parent context handle and seq_num stream.
 	As with all RPCSEC_GSSv3 messages, the header checksum uses the parent
         context, and needs to be valid.
       </t>
