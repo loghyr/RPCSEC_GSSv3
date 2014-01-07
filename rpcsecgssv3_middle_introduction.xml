@@ -420,12 +420,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
            enum auth_stat {
                    ...
                    /*
-                    * RPCSEC_GSS errors
+                    * RPCSEC_GSSv3 errors
                     */
                    RPCSEC_GSS3_COMPOUND_PROBEM = <>,
                    RPCSEC_GSS3_LABEL_PROBLEM = <>,
-                   RPCSEC_GSS3_UNKNOWN_ASSERTION = <>
-                   RPCSEC_GSS3_UNKNOWN_EXTENSION = <>
+                   RPCSEC_GSS3_UNKNOWN_PRIVILEGE = <>
                    RPCSEC_GSS3_UNKNOWN_MESSAGE = <>
            };
         </artwork>
@@ -434,6 +433,13 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     <t>
         <cref anchor='AI4' source='NW'>
           fix above into YYY. All the entries are TBD...
+        </cref>
+        <cref anchor='AI5' source='AA'>
+          The compound authentication problems are: can't find the handle plus
+	  handle version on the target, or the MIC of the nounce does not
+	  match. Both of these errors already have auth_stat entries:
+	  RPCSEC_GSS_CREDPROBLEM for the first and "reply status of MSG_ACCEPTED,
+	  and an acceptance status of GARBAGE_ARGS."
         </cref>
       </t>
 
@@ -590,7 +596,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         to reference the parent context given the child context handle.
       </t>
       <t>
-        <cref anchor='AI5' source='AA'>
+        <cref anchor='AI6' source='AA'>
           Destruction of the parent context => first destroy child handle.
           IOW fail the RPCSEC_GSS_DESTROY of parent with new
           RPCSEC_GSS3_CONTEXT_EXISTS error code OR upon the destruction of
@@ -777,7 +783,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 
       <t>
-        <cref anchor='AI6' source='AA'>
+        <cref anchor='AI7' source='AA'>
          Check that this Label definition provides all the required pieces to
          enable full mode when combined with NFSv4.2 LNFS. Specifically, how
          does the client find out and respond if a server has changed a label. 
