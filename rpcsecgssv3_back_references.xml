@@ -2,34 +2,6 @@
 <!-- Copyright (C) The Internet Society (2011) -->
   <references title="Normative References">
 
-    <reference anchor='RFC1831'>
-      <front>
-	<title abbrev='Remote Procedure Call Protocol Version 2'>RPC:
-	Remote Procedure Call Protocol Specification Version 2</title>
-	<author initials='R.' surname='Srinivasan' fullname='Raj Srinivasan'>
-	  <organization>Sun Microsystems, Inc., ONC Technologies</organization>
-	  <address>
-	    <postal>
-	      <street>2550 Garcia Avenue</street>
-	      <street>M/S MTV-5-40</street>
-	      <city>Mountain View</city>
-	      <region>CA</region>
-	      <code>94043</code>
-	    <country>US</country></postal>
-	    <phone>+1 415 336 2478</phone>
-	    <facsimile>+1 415 336 6015</facsimile>
-	<email>raj@eng.sun.com</email></address></author>
-	<date year='1995' month='August' />
-	<abstract>
-      <t>This document describes the ONC Remote Procedure Call (ONC
-      RPC Version 2) protocol as it is currently deployed and
-      accepted.  "ONC" stands for "Open Network
-      Computing".</t></abstract></front>
-
-      <seriesInfo name='RFC' value='1831' />
-      <format type='TXT' octets='37798' target='ftp://ftp.isi.edu/in-notes/rfc1831.txt' />
-    </reference>
-
     <reference anchor='RFC2119'>
       <front>
 	<title abbrev='RFC Key Words'>Key words for use in RFCs to Indicate Requirement Levels</title>
@@ -44,6 +16,7 @@
 	<email>sob@harvard.edu</email></address></author>
 	<date year='1997' month='March' />
       </front>
+      <seriesInfo name='RFC' value='2119' />
     </reference>
 
     <reference anchor='RFC2203'>
@@ -174,7 +147,7 @@
 
         <date month='March' year='2013' />
       </front>
-      <seriesInfo name="draft-ietf-nfsv4-minorversion2-19" value="(Work In Progress)"/>
+      <seriesInfo name="draft-ietf-nfsv4-minorversion2-21" value="(Work In Progress)"/>
     </reference>
 
 
@@ -203,6 +176,41 @@
     <format type="TXT"
       target="ftp://ftp.isi.edu/in-notes/rfc4506.txt"/>
   </reference>
+
+    <reference anchor='RFC5403'>
+    
+      <front>
+      <title>RPCSEC_GSS Version 2</title>
+
+        <author initials='M.' surname='Eisler' fullname='Michael Eisler'>
+        <organization>NetApp</organization>
+        <address>
+        <postal>
+        <street>5765 Chase Point Circle</street>
+        <street>Colorado Springs</street>
+        <street>CO  80919</street></postal>
+        <phone>+1 (719) 599-9026</phone>
+        <email>mike@eisler.com</email></address></author>
+
+      <date year='2009' month='February' />
+      <area>Security</area>
+      <keyword>generic security service</keyword>
+      <keyword>remote procedure call</keyword>
+      <keyword>security</keyword>
+      <abstract>
+      <t>
+        This document describes version 2 of the RPCSEC_GSS protocol.
+        Version 2 is the same as version 1 (specified in RFC 2203) except
+        that support for channel bindings has been added.  RPCSEC_GSS allows
+        remote procedure call (RPC) protocols to access the Generic Security
+        Services Application Programming Interface (GSS-API).
+      </t></abstract></front>
+      
+      <seriesInfo name='RFC' value='5403' />
+      <format type='TXT' octets='50937' target='ftp://ftp.isi.edu/in-notes/rfc5403.txt' />
+    </reference>
+
+  
         
 </references>
 
@@ -276,7 +284,7 @@ target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
           <organization />
         </author>
       </front>
-      <seriesInfo name="draft-ietf-nfsv4-labreqs-03" value="(work in progress)" />
+      <seriesInfo name="draft-ietf-nfsv4-labreqs-05" value="(work in progress)" />
     </reference>
 
 </references>
