@@ -123,14 +123,59 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     The entire RPCSEC_GSSv3 protocol is not presented. Instead the differences
     between RPCSEC_GSSv3 and RPCSEC_GSSv2 are shown.
   </t>
+  <t>
+    RPCSEC_GSSv3 is patterned as follows:
+    <list style='symbols'>
+      <t> 
+        A client uses an existing RPCSEC_GSSv3 context
+        handle to protect RPCSEC_GSSv3 exchanges, this will be termed the
+        "parent" handle.
+        <cref anchor='AI1' source='AA'>
+          CAN A CHILD handle be used as a parent?    
+        </cref>
+      </t> 
+      <t> 
+        The server issues a "child" RPCSEC_GSSv3 handle in the
+        RPCSEC_GSS_CREATE response which uses the
+        underlying GSS-API security context of the parent handle in all
+        subsequent exchanges that uses the child handle.
+      </t>
+    </list>
+  </t> 
 
-  <section title="Compatibilty with RPCSEC_GSSv2">
+  <section title="Compatibility with RPCSEC_GSSv2">
   <t> 
     The functionality of <xref target="RFC5403">RPCSEC_GSSv2</xref> is fully
     supported by RPCSEC_GSSv3.
   </t>
-  </section> <!-- Compatibilty with RPCSEC_GSSv2 -->
-  
+  </section> <!-- Compatibility with RPCSEC_GSSv2 -->
+
+  <section title="New REPLY verifier">
+  <t> 
+    The RPCSEC_GSSv3 child handle uses the same GSS context as the parent
+    handle. Since a child and parent RPCSEC_GSSv3 handle could have the same
+    RPCSEC_GSS sequence numbers, and the verifier of RPCSEC_GSS replies
+    computes a MIC on just the sequence number, this provides
+    opportunities for man in the middle attacks.
+  </t>
+  <t>
+    This is easily addressed: RPCSEC_GSS version 3 MUST change the verifier of
+    the reply to compute the verifier using the exact same input as that is
+    used for verifier of the request, except for the mtype change from CALL
+    to REPLY:
+    <figure>
+      <artwork>
+  unsigned int xid;
+  msg_type mtype;    /* set to REPLY */
+  unsigned int rpcvers;
+  unsigned int prog;
+  unsigned int vers;
+  unsigned int proc;
+  opaque_auth  cred; /* captures the RPCSEC_GSS handle */
+      </artwork>
+    </figure>
+  </t>
+  </section> <!-- New REPLY verifier -->
   <section title="New Version Number">
     <t>
       &lt;CODE BEGINS&gt;
@@ -199,7 +244,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///           RPCSEC_GSS_INIT          = 1,
    ///           RPCSEC_GSS_CONTINUE_INIT = 2,
    ///           RPCSEC_GSS_DESTROY       = 3,
-   ///           RPCSEC_GSS_BIND_CHANNEL  = 4,
+   ///           RPCSEC_GSS_BIND_CHANNEL  = 4, /* not used */
    ///           RPCSEC_GSS_CREATE        = 5, /* new */
    ///           RPCSEC_GSS_LIST          = 6  /* new */
    ///  };
@@ -243,24 +288,24 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       RPCSEC_GSS_LIST.
     </t>
     <t>
-      The RPCSEC_GSS_CREATE procedure binds any combination of compound
-      authentication, channel bindings, and assertions to an existing
-      RPCSEC_GSSv3 context created in the normal RPCSEC_GSS manner
-      as described in Section 5.2 of <xref target="RFC2203" />.
+      The RPCSEC_GSS_CREATE procedure binds any combination of assertions:
+      compound authentication, labels, structured privileges, or channel
+      bindings to a new RPCSEC_GSSv3 context returned in the rgss3_create_res
+      rcr_handle field.
     </t>
     <t>
-      The RPCSEC_GSS_LIST proceedure queries the target for supported
-      attributes.
+      The RPCSEC_GSS_LIST procedure queries the target for supported
+      assertions.
     </t>
     <t>
-      RPCSEC_GSSv3 control messages are similar to the RPCSEC_GSS version 1 and
-      version2
+      RPCSEC_GSS version 3 control messages are similar to the
+      RPCSEC_GSS version 1 and version2
       RPCSEC_GSS_DESTROY control message (see section 5.4
       <xref target="RFC2203" />) in that the sequence number
       in the request must be valid, and the header checksum in the verifier
       must be valid.  As in RPCSEC_GSS version 1 and version 2, the
-      RPCSEC_GSSv3 control messages may contains call data following the
-      verifier in the body of the NULLPROC procedure.
+      RPCSEC_GSSv version 3 control messages may contain call data
+      following the verifier in the body of the NULLPROC procedure.
       In other words, they look a lot like an
       RPCSEC_GSS data message with the header procedure set to NULLPROC.   
     </t>
@@ -284,54 +329,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       Specifically the client MUST NOT use rpc_gss_svc_none.
     </t>
 
-    <section title="New Control Procedure - RPCSEC_GSS_LIST">
-      <t>
-        &lt;CODE BEGINS&gt;
-      </t>
-      <figure>
-        <artwork>
-   ///  enum rgss3_list_item {
-   ///          LABEL = 0
-   ///  };
-   ///
-   ///  struct rgss3_list_args {
-   ///          rgss3_list_item      rla_list_what<>;
-   ///  };
-   ///
-   ///  union rgss3_list_item_u
-   ///        switch (rgss3_list_item itype) {
-   ///  case LABEL:
-   ///          rgss3_label          rli_labels<>;
-   ///  default:
-   ///          opaque               rli_ext<>;
-   ///  };
-   ///
-   ///  typedef rgss3_list_item_u rgss3_list_res<>;
-   ///
-        </artwork>
-      </figure>
-      <t>
-        &lt;CODE ENDS&gt;
-      </t>
-      <t>
-        The call data for an RPCSEC_GSS_LIST request consists of a list
-        of integers (rla_list_what<>) indicating what should be listed,
-        and the reply consists of an error or the requested list.
-        The client may query the server to list available LFSs.
-      </t>
-      <t>
-        <cref anchor='AI1' source='AA'>
-          What good is the rli_ext field? How should we describe it's use?   
-        </cref>
-      </t>
-      <t>
-        The result of requesting a list of rgss3_list_item LABEL 
-        is a list of LFSs supported by the server. The client can then use
-        the LFS list to assert labels via the RPCSEC_GSS_CREATE label
-        assertions. See <xref target="ss:la" />.
-      </t>
-    </section> <!-- New Control Procedure - RPCSEC_GSS_LIST -->
-
     <section title="New Control Procedure - RPCSEC_GSS_CREATE">
       <t>
         &lt;CODE BEGINS&gt;
@@ -345,9 +342,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///  };
    ///
    ///  struct rgss3_create_res {
+   ///          opaque               rcr_handle<>;
    ///          rgss3_gss_binding    *rcr_comp_auth;
    ///          rgss3_chan_binding   *rcr_chan_bind_mic;
-   ///          rgss3_assertion      rcr_grant_assertions<>;
+   ///          rgss3_assertion      rcr_assertions<>;
    ///  };
    ///
    ///  enum rgss3_assertion_type {
@@ -378,8 +376,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       <t>
         The call data for an RPCSEC_GSS_CREATE request
         consists of an rgss3_create_args which
-        binds one or more items of several kinds to the RPCSEC_GSSv3
-        context handle:
+        binds one or more items of several kinds to the returned rcr_handle
+        RPCSEC_GSSv3 context handle called the "child" handle:
         <list style='symbols'>
           <t>
             Compound authentication: another RPCSEC_GSS context handle
@@ -393,6 +391,16 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </list>
         The reply to this message consists of either an error or an
         rgss3_create_res structure.
+      </t>
+      <t>
+        Upon successful RPCSEC_GSS_CREATE, both the client and the server
+        SHOULD associate the resultant child rcr_handle context handle with the
+        parent context handle in their GSS context caches so as to be able to
+        reference the parent context given the child context handle.
+      </t>
+      <t>
+        RPCSEC_GSSv3 child handles MUST be destroyed upon the destruction of
+        the associated parent handle.
       </t>
       <t>
         Server implementation and policy MAY result in labels,
@@ -411,11 +419,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           <artwork>
    ///
    ///  struct rgss3_gss_binding {
-   ///          unsigned int    rgb_vers; /* inner handle version */
    ///          opaque          rgb_handle<>; /* inner handle */
    ///          opaque          rgb_nonce<>;
    ///          opaque          rgb_nounc_mic<>;
    ///  };
+   ///
           </artwork>
         </figure>
         <t>
@@ -426,21 +434,21 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           client host and a user. This is done by including an assertion of
           type rgss3_gss_binding in the RPCSEC_GSS_CREATE rgss3_create_args
           call data.
-          In addition to the RPCSEC_GSSv3 credential handle termed the
-          "outer handle",
+          In addition to the <xref target="sec:protocol">parent handle</xref>,
           the compound authentication rgss3_gss_binding call data has an
-          RPCSEC_GSS handle referenced via the rgb_handle field
+          RPCSEC_GSS version 3 handle referenced via the rgb_handle field
           termed the "inner" handle.
           A nonce and a MIC of that nounce created using the GSS-API security
-          context associated with the "inner" handle is also provided.
+          context associated with the inner handle is also provided.
         </t>
         <t>
+          The target verifies the compounding by verifying the rgb_nouce_mic.
           On a successful reply, the rgss3_gss_binding field in the
           rgss3_create_res reply uses the
-          outer RPCSEC_GSSv3 handle as the rgb_handle, the same rgb_nounce
+          parent RPCSEC_GSSv3 context as the rgb_handle, the same rgb_nounce
           as was sent in the call data with the rgb_nounce_mic created using
-          the GSS-API security context associate with the outer handle.
-          Verification of the rbg_nounce_mic by the initiator demostrates
+          the GSS-API security context associate with the parent handle.
+          Verification of the rbg_nounce_mic by the initiator demonstrates
           that the target agrees to the compounding. On failure, the
           rgss3_gss_binding field is not sent.
           (rgss3_gss_binding is an optional field)
@@ -515,7 +523,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           The labels that are accepted by the target and bound to the
           RPCSEC_GSSv3 context will be enumerated
-          in the rcr_grant_assertions field of the rgss3_create_res
+          in the rcr_assertions field of the rgss3_create_res
           RPCSEC_GSS_CREATE reply.
         </t>
         <t>
@@ -530,8 +538,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           model to interpret and enforce.
         </t>
         <t>
-          The combination of asserting a server supported label via
-          RPCSEC_GSS_CREATE enables server guest mode labels. 
+          Asserting a server supported label via RPCSEC_GSS_CREATE
+          enables server guest mode labels. 
           Full mode is enabled when an RPCSEC_GSS_CREATE label assertion is
           combined with asserting the same label with the NFSv4.2
           sec_label attribute.
@@ -595,7 +603,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           A successful structured privilege assertion will be enumerated in
-          the rcr_grant_assertions field of the rgss3_create_res
+          the rcr_assertions field of the rgss3_create_res
           RPCSEC_GSS_CREATE reply.
         </t>
         <t>
@@ -671,7 +679,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           the channel bindings data (including the channel type prefix).  If
           client-side channel binding verification fails then the client MUST
           call RPCSEC_GSS_DESTROY.  If the client requested channel binding
-          but the server did not include a chan_binding_mic field in the
+          but the server did not include an rcr_chan_binding_mic field in the
           results, then the client MAY continue to use the resulting context
           handle as though channel binding had never been requested, otherwise
           (if the client really wanted channel binding) it MUST call
@@ -703,6 +711,55 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
     </section> <!-- New Control Procedure - RPCSEC_GSS_CREATE -->
 
+    <section title="New Control Procedure - RPCSEC_GSS_LIST">
+      <t>
+        &lt;CODE BEGINS&gt;
+      </t>
+      <figure>
+        <artwork>
+   ///  enum rgss3_list_item {
+   ///          LABEL = 0,
+   ///          PRIVS = 1
+   ///  };
+   ///
+   ///  struct rgss3_list_args {
+   ///          rgss3_list_item      rla_list_what<>;
+   ///  };
+   ///
+   ///  union rgss3_list_item_u
+   ///        switch (rgss3_list_item itype) {
+   ///  case LABEL:
+   ///          rgss3_label          rli_labels<>;
+   ///  case PRIVS:
+   ///          rgss3_privs          rli_privs<>;
+   ///  default:
+   ///          opaque               rli_ext<>;
+   ///  };
+   ///
+   ///  typedef rgss3_list_item_u rgss3_list_res<>;
+   ///
+        </artwork>
+      </figure>
+      <t>
+        &lt;CODE ENDS&gt;
+      </t>
+      <t>
+        The call data for an RPCSEC_GSS_LIST request consists of a list
+        of integers (rla_list_what<>) indicating what assertions to be listed,
+        and the reply consists of an error or the requested list.
+      </t>
+      <t>
+        <cref anchor='AI3' source='AA'>
+          What good is the rli_ext field? How should we describe it's use?   
+        </cref>
+      </t>
+      <t>
+        The result of requesting a list of rgss3_list_item LABEL 
+        is a list of LFSs supported by the server. The client can then use
+        the LFS list to assert labels via the RPCSEC_GSS_CREATE label
+        assertions. See <xref target="ss:la" />.
+      </t>
+    </section> <!-- New Control Procedure - RPCSEC_GSS_LIST -->
 
   </section> <!-- New Control Procedures -->
 
@@ -758,10 +815,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </artwork>
     </figure>
       <t>
-        <cref anchor='AI3' source='NW'>
+        <cref anchor='AI4' source='NW'>
           fix above into YYY. All the entries are TBD...
         </cref>
-        <cref anchor='AI4' source='AA'>
+        <cref anchor='AI5' source='AA'>
           The compound authentication problems are: can't find the handle plus
 	  handle version on the target, or the MIC of the nounce does not
 	  match. Both of these errors already have auth_stat entries:
@@ -847,13 +904,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     protected by RPCSEC_GSSv3 contexts.
   </t>
   <t>
-    <cref anchor='AI5' source='NW'>
+    <cref anchor='AI6' source='NW'>
       [Add text about interaction with GSS-SSV...]
-    </cref>
-  </t>
-  <t>
-    <cref anchor='AI6' source='AA'>
-      I see no reason to use RPCSEC_GSSv3 contexts for NFSv4.x back channel.
     </cref>
   </t>
   <t>
