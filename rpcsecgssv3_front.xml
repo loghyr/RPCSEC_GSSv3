@@ -46,8 +46,9 @@
     <abstract>
       <t>
         This document specifies version 3 of the Remote Procedure Call (RPC)
-        security protocol (RPCSEC_GSS).  This protocol provides for compound
-        authentication of client hosts and users to server (constructed by
+        security protocol (RPCSEC_GSS).  This protocol provides
+        for multi-principal authentication of client hosts and
+        user principals to server (constructed by
         generic composition), security label assertions for
         multi-level and type enforcement, structured privilege assertions,
         and channel bindings.

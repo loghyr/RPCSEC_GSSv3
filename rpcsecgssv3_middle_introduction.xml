@@ -32,7 +32,7 @@
     the destination.  In secure NFSv4 inter-server server-side copy
     (see Section 3.4.1 of <xref target='ref:nfsv4.2' />),
     the user first secures access to both source and destination files,
-    and then uses RPCSEC_GSSv3 compound authentication and structured
+    and then uses RPCSEC_GSSv3 multi-principal authentication and structured
     privileges to authorize the destination to copy the file from the
     source on behalf of the user.
   </t>
@@ -54,7 +54,7 @@
         see server-side copy <xref target='ref:nfsv4.2' />.
       </t>
       <t>
-        Compound authentication of the client host and user to the server
+        Multi-principal authentication of the client host and user to the server
         done by binding two RPCSEC_GSS handles. For an example
         see server-side copy <xref target='ref:nfsv4.2' />.
       </t>
@@ -289,7 +289,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
     <t>
       The RPCSEC_GSS_CREATE procedure binds any combination of assertions:
-      compound authentication, labels, structured privileges, or channel
+      multi-principal authentication, labels, structured privileges, or channel
       bindings to a new RPCSEC_GSSv3 context returned in the rgss3_create_res
       rcr_handle field.
     </t>
@@ -336,14 +336,14 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       <figure>
         <artwork>
    ///  struct rgss3_create_args {
-   ///          rgss3_gss_binding    *rca_comp_auth;
+   ///          rgss3_gss_mp_auth    *rca_mp_auth;
    ///          rgss3_chan_binding   *rca_chan_bind_mic;
    ///          rgss3_assertion      rca_assertions<>;
    ///  };
    ///
    ///  struct rgss3_create_res {
    ///          opaque               rcr_handle<>;
-   ///          rgss3_gss_binding    *rcr_comp_auth;
+   ///          rgss3_gss_mp_auth    *rcr_mp_auth;
    ///          rgss3_chan_binding   *rcr_chan_bind_mic;
    ///          rgss3_assertion      rcr_assertions<>;
    ///  };
@@ -380,7 +380,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         RPCSEC_GSSv3 context handle called the "child" handle:
         <list style='symbols'>
           <t>
-            Compound authentication: another RPCSEC_GSS context handle
+            Multi-principal authentication: another RPCSEC_GSS context handle
           </t>
           <t>
             Authorization assertions: labels and or privileges
@@ -411,17 +411,17 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         the GSS-API.  
       </t>
 
-      <section anchor="ss:ca" title="Compound Authentication">
+      <section anchor="ss:ca" title="Multi-principal Authentication">
         <t>
           &lt;CODE BEGINS&gt;
         </t>
         <figure>
           <artwork>
    ///
-   ///  struct rgss3_gss_binding {
-   ///          opaque          rgb_handle<>; /* inner handle */
-   ///          opaque          rgb_nonce<>;
-   ///          opaque          rgb_nounc_mic<>;
+   ///  struct rgss3_gss_mp_auth {
+   ///          opaque          rgmp_handle<>; /* inner handle */
+   ///          opaque          rgmp_nonce<>;
+   ///          opaque          rgmp_nounc_mic<>;
    ///  };
    ///
           </artwork>
@@ -430,30 +430,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           &lt;CODE ENDS&gt;
         </t>
         <t>
-          RPCSEC_GSSv3 clients MAY assert a compound authentication of the
-          client host and a user. This is done by including an assertion of
-          type rgss3_gss_binding in the RPCSEC_GSS_CREATE rgss3_create_args
-          call data.
-          In addition to the <xref target="sec:protocol">parent handle</xref>,
-          the compound authentication rgss3_gss_binding call data has an
-          RPCSEC_GSS version 3 handle referenced via the rgb_handle field
-          termed the "inner" handle.
-          A nonce and a MIC of that nounce created using the GSS-API security
-          context associated with the inner handle is also provided.
-        </t>
-        <t>
-          The target verifies the compounding by verifying the rgb_nouce_mic.
-          On a successful reply, the rgss3_gss_binding field in the
-          rgss3_create_res reply uses the
-          parent RPCSEC_GSSv3 context as the rgb_handle, the same rgb_nounce
-          as was sent in the call data with the rgb_nounce_mic created using
-          the GSS-API security context associate with the parent handle.
-          Verification of the rbg_nounce_mic by the initiator demonstrates
-          that the target agrees to the compounding. On failure, the
-          rgss3_gss_binding field is not sent.
-          (rgss3_gss_binding is an optional field)
-        </t>
-        <t>
+          RPCSEC_GSSv3 clients MAY assert a multi-principal authentication of
+          the client host principal and a user principal.
           This feature is needed, for example, when a client wishes to use
           authority assertions that the server may only grant if a user and a
           client are authenticated together to the server.  Thus a server may
@@ -472,22 +450,48 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           user security context.
         </t>
         <t>
-          Clients using RPCSEC_GSSv3 compound authentication MUST use
+          In addition to the <xref target="sec:protocol">parent handle</xref>,
+          the multi-principal authentication call data has an
+          RPCSEC_GSS version 3 handle referenced via the rgmp_handle field
+          termed the "inner" handle.
+          Clients using RPCSEC_GSSv3 multi-principal authentication MUST use
           an RPCSEC_GSSv3 context handle that corresponds to a
           GSS-API security context that authenticates the client host for
-          the outer handle. The inner context handle it SHOULD use a context
-          handle to authenticate a user.  The reverse (outer handle
+          the parent handle. The inner context handle it SHOULD use a context
+          handle to authenticate a user.  The reverse (parent handle
           authenticates user, inner authenticates client) MUST NOT be used.
-          Other compounds might eventually make sense.
+          Other multi-principal parent and inner context handle uses might
+          eventually make sense.
         </t>
         <t>
-          An inner RPCSEC_GSSv3 context handle that is bound to an outer
-          RPCSEC_GSS context MUST be treated by servers as authenticating the
+          An inner RPCSEC_GSSv3 context handle that is bound to a parent
+          RPCSEC_GSS context through multi-principal authentication
+          MUST be treated by servers as authenticating the
           GSS-API initiator principal authenticated by the inner context
-          handle's GSS- API security context.  This principal may be mapped
+          handle's GSS-API security context.  This principal may be mapped
           to a server-side notion of user or principal.
         </t>
-      </section> <!-- Compound Authentication -->
+        <t>
+          Multi-principal binding is done by including an assertion of
+          type rgss3_gss_mp_auth in the RPCSEC_GSS_CREATE rgss3_create_args
+          call data. The inner context handle is place in the rbmp_handle
+          field.  A nonce and a MIC of that nounce created using the
+          GSS-API security context associated with the inner handle is also
+          provided.
+        </t>
+        <t>
+          The target verifies the multi-principal authentication by verifying
+          the rgmp_nouce_mic.
+          On a successful reply, the rgss3_gss_mp_auth field in the
+          rgss3_create_res reply uses the
+          parent RPCSEC_GSSv3 context as the rgmp_handle, the same rgmp_nounce
+          as was sent in the call data with the rgmp_nounce_mic created using
+          the GSS-API security context associate with the parent handle.
+          Verification of the rbg_nounce_mic by the initiator demonstrates
+          that the target agrees to the multi-principal authentication.
+        </t>
+
+      </section> <!-- Multi-principal Authentication -->
 
       <section anchor="ss:la" title="Label Assertions">
         <t>
@@ -819,7 +823,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           fix above into YYY. All the entries are TBD...
         </cref>
         <cref anchor='AI5' source='AA'>
-          The compound authentication problems are: can't find the handle plus
+          The multi-principal authentication problems are: can't find the handle plus
 	  handle version on the target, or the MIC of the nounce does not
 	  match. Both of these errors already have auth_stat entries:
 	  RPCSEC_GSS_CREDPROBLEM for the first and "reply status of
@@ -866,7 +870,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     The RPCSEC_GSSv3 protocol allows for client-side assertions of data
     that is relevant to server-side authorization decisions.  These
     assertions must be evaludated by the server in the context of whether
-    the client and/or user are authenticated, whether compound
+    the client and/or user are authenticated, whether multi-principal
     authentication was used, whether the client is trusted, what ranges
     of assertions are allowed for the client and the user (separately or
     together), and any relevant server-side policy.
@@ -911,7 +915,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <t>
     <cref anchor='AI7' source='AA'>
       AFAICS the reason to use SSV is to avoid using a client machine credential
-      which means compound authentication can not be used.
+      which means multi-principal authentication can not be used.
     </cref>
   </t>
 </section> <!-- Security Considerations -->
