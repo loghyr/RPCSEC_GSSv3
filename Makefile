@@ -4,8 +4,8 @@
 YEAR=`date +%Y`
 MONTH=`date +%B`
 DAY=`date +%d`
-PREVVERS=06
-VERS=07
+PREVVERS=07
+VERS=08
 XML2RFC=/Users/andros/ietf/xml2rfc-1.36/xml2rfc.tcl
 
 autogen/%.xml : %.x
