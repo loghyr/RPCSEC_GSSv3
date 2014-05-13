@@ -150,6 +150,22 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
   </section> <!-- Compatibility with RPCSEC_GSSv2 -->
 
+<section title="Version Negotiation">
+  <t>
+    An initiator that supports version 3 of RPCSEC_GSS simply issues an
+    RPCSEC_GSS request with the rgc_version field set to
+    RPCSEC_GSS_VERS_3.  If the target does not recognize
+    RPCSEC_GSS_VERS_3, the target will return an RPC error per Section
+    5.1 of <xref target="RFC2203" />.
+  </t>
+  <t>
+    The initiator MUST NOT attempt to use an RPCSEC_GSS handle returned
+    by version 3 of a target with version 1 or version 2 of the same target.
+    The initiator MUST NOT attempt to use an RPCSEC_GSS handle returned by
+    version 1 or version 2 of a target with version 3 of the same target.
+  </t>
+</section> <!-- Version Negotiation -->
+
   <section title="New REPLY verifier">
   <t> 
     The RPCSEC_GSSv3 child handle uses the same GSS context as the parent
@@ -853,22 +869,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </section> <!-- Extensibility -->
 
 </section> <!-- The RPCSEC_GSSv3 Protocol -->
-
-<section title="Version Negotiation">
-  <t>
-    An initiator that supports version 3 of RPCSEC_GSS simply issues an
-    RPCSEC_GSS request with the rgc_version field set to
-    RPCSEC_GSS_VERS_3.  If the target does not recognize
-    RPCSEC_GSS_VERS_3, the target will return an RPC error per Section
-    5.1 of <xref target="RFC2203" />.
-  </t>
-  <t>
-    The initiator MUST NOT attempt to use an RPCSEC_GSS handle returned
-    by version 3 of a target with version 1 or version 2 of the same target.
-    The initiator MUST NOT attempt to use an RPCSEC_GSS handle returned by
-    version 1 or version 2 of a target with version 3 of the same target.
-  </t>
-</section> <!-- Version Negotiation -->
 
 <section title="Operational Recommendation for Deployment">
 
