@@ -298,7 +298,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
                     */
                    RPCSEC_GSS_INNER_CREDPROBLEM = 15,
                    RPCSEC_GSS_LABEL_PROBLEM = 16,
-                   RPCSEC_GSS_UNKNOWN_PRIVILEGE = 17,
+                   RPCSEC_GSS_PRIVILEGE_PROBLEM = 17,
                    RPCSEC_GSS_UNKNOWN_MESSAGE = 18 
            };
         </artwork>
@@ -602,14 +602,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           sec_label attribute.
         </t>
         <t>
-          <cref anchor='AI2' source='AA'>
-           Check that this Label discussion provides all the required pieces to
-           enable full mode when combined with NFSv4.2 LNFS. Specifically, how
-           does the client find out and respond if a server has
-           changed a label. 
-          </cref>
-        </t>
-        <t>
           If a label itself requires privacy protection (i.e., that the user
           can assert that label is a secret) then the client MUST use the
           rpc_gss_svc_privacy protection service for the RPCSEC_GSS_CREATE
@@ -662,6 +654,15 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           A successful structured privilege assertion will be enumerated in
           the rcr_assertions field of the rgss3_create_res
           RPCSEC_GSS_CREATE reply.
+        </t>
+	<t>
+          If a server receives a structured privilege assertion that it
+          does not recognize the assertion is rejected with MSG_DENIED,
+          a reject_status of AUTH_ERROR, and an auth_stat of
+          RPCSEC_GSS_UNKNOWN_MESSAGE. If the server fails the RPC application
+          defined server verification for a structured privilege, the
+          assertion is rejected with MSG_DENIED, a reject_status of AUTH_ERROR,
+          and an auth_stat of RPCSEC_GSS_PRIVILEGE_PROBLEM.
         </t>
         <t>
           Section 3.4.1.2. "Inter-Server Copy with RPCSEC_GSSv3"
