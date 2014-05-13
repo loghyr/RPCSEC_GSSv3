@@ -282,6 +282,29 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
   </section> <!-- New Version Number -->
 
+  <section anchor="ss:nasv" title="New auth_stat Values">
+    <t>
+      RPCSEC_GSSv3 requires the addition of several values to the auth_stat
+      enumerated type definition. The use of each of these new auth_stat
+      values is explained later in this document.
+    </t>
+
+    <figure>
+        <artwork>
+           enum auth_stat {
+                   ...
+                   /*
+                    * RPCSEC_GSSv3 errors
+                    */
+                   RPCSEC_GSS_INNER_CREDPROBLEM = 15,
+                   RPCSEC_GSS_LABEL_PROBLEM = 16,
+                   RPCSEC_GSS_UNKNOWN_PRIVILEGE = 17,
+                   RPCSEC_GSS_UNKNOWN_MESSAGE = 18 
+           };
+        </artwork>
+    </figure>
+  </section> <!-- New Auth Stat Values -->
+
   <section anchor="ss:cm" title="New Control Procedures">
     <t>
       There are two new RPCSEC_GSSv3 control procedures: RPCSEC_GSS_CREATE,
@@ -489,6 +512,36 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           the GSS-API security context associate with the parent handle.
           Verification of the rbg_nounce_mic by the initiator demonstrates
           that the target agrees to the multi-principal authentication.
+        </t>
+        <t>
+          On failure, the rgss3_gss_mp_auth field is not sent
+          (rgss3_gss_mp_auth is an optional field).
+          A MSG_DENIED reply to an RPCSEC_GSS_CREATE formulated as usual.
+          A new value, RPCSEC_GSS_INNER_CREDPROBLEM, has been added to the
+          auth_stat type.
+          As described in Section 5.3.3.3 of <xref target="RFC2203" />
+          the server maintains a list of contexts for the clients that are
+          currently in session with it. When a client request comes in, there
+          may not be a context corresponding to its handle. When this occurs
+          on an RPCSEC_GSS3_CREATE request processing of the parent handle,
+          the server rejects the request with a reply status of MSG_DENIED
+          with the reject_stat of AUTH_ERROR and with an auth_stat value of
+          RPCSEC_GSS_CREDPROBLEM.
+        </t>
+        <t>
+          With a multi-pricipal authorization request, the server must also have
+          a context corresponding to the inner context handle. When the server
+          does not have a context handle corresponding to the inner
+          context handle of a multi-pricipal authorization request, the server
+          send a reply status of MSG_DENIED with the reject_stat of AUTH_ERROR
+          and with an auth_stat value of RPCSEC_GSS_INNER_CREDPROBLEM.
+        </t>
+        <t>
+          When processing the multi-principal authentication request, if the
+          GSS_VerifyMIC() call on the inner handle nouce fails to return
+          GSS_S_COMPLETE, the server sends a reply status of MSG_DENIED with
+          the reject_stat of AUTH_ERROR and with an auth_stat value of
+          RPCSEC_GSS_INNER_CREDPROBLEM.
         </t>
 
       </section> <!-- Multi-principal Authentication -->
@@ -797,40 +850,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         an error.
       </t>
     </section> <!-- Extensibility -->
-
-  <section anchor="ss:nasv" title="New auth_stat Values">
-    <t>
-        RPCSEC_GSSv3 requires the addition of several values to the auth_stat
-        enumerated type definition:
-    </t>
-
-    <figure>
-        <artwork>
-           enum auth_stat {
-                   ...
-                   /*
-                    * RPCSEC_GSSv3 errors
-                    */
-                   RPCSEC_GSS_COMPOUND_PROBLEM = <>,
-                   RPCSEC_GSS_LABEL_PROBLEM = <>,
-                   RPCSEC_GSS_UNKNOWN_PRIVILEGE = <>
-                   RPCSEC_GSS_UNKNOWN_MESSAGE = <>
-           };
-        </artwork>
-    </figure>
-      <t>
-        <cref anchor='AI4' source='NW'>
-          fix above into YYY. All the entries are TBD...
-        </cref>
-        <cref anchor='AI5' source='AA'>
-          The multi-principal authentication problems are: can't find the handle plus
-	  handle version on the target, or the MIC of the nounce does not
-	  match. Both of these errors already have auth_stat entries:
-	  RPCSEC_GSS_CREDPROBLEM for the first and "reply status of
-          MSG_ACCEPTED, and an acceptance status of GARBAGE_ARGS."
-      </cref>
-      </t>
-    </section> <!-- New Auth Stat Values -->
 
 </section> <!-- The RPCSEC_GSSv3 Protocol -->
 
