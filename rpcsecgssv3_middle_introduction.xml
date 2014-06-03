@@ -130,15 +130,16 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         A client uses an existing RPCSEC_GSSv3 context
         handle to protect RPCSEC_GSSv3 exchanges, this will be termed the
         "parent" handle.
-        <cref anchor='AI1' source='AA'>
-          CAN A CHILD handle be used as a parent?    
-        </cref>
       </t> 
       <t> 
         The server issues a "child" RPCSEC_GSSv3 handle in the
         RPCSEC_GSS_CREATE response which uses the
         underlying GSS-API security context of the parent handle in all
         subsequent exchanges that uses the child handle.
+      </t>
+      <t>
+	An RPCSEC_GSSv3 child handle MUST NOT be used as the parent handle
+        in an RPCSEC_GSS3_CREATE control message.
       </t>
     </list>
   </t> 
