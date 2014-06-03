@@ -179,7 +179,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     This is easily addressed: RPCSEC_GSS version 3 MUST change the verifier of
     the reply to compute the verifier using the exact same input as that is
     used for verifier of the request, except for the mtype change from CALL
-    to REPLY:
+    to REPLY. The new reply verifier computes a MIC over the following data:
     <figure>
       <artwork>
   unsigned int xid;
