@@ -32,9 +32,17 @@
     the destination.  In secure NFSv4 inter-server server-side copy
     (see Section 3.4.1 of <xref target='ref:nfsv4.2' />),
     the user first secures access to both source and destination files,
-    and then uses RPCSEC_GSSv3 multi-principal authentication and structured
+    and then uses NFSv4.2 defined RPCSEC_GSSv3 structured
     privileges to authorize the destination to copy the file from the
     source on behalf of the user.
+  </t>
+  <t>
+    XXX Nico review this paragraph please XXXX.
+    Multi-principal assertions can be used to address the "user can
+    impersonate the server to the client" problem and cache poisoning
+    attacks on the client by the user. Another use is the secure conveyance
+    of privilege information for processes running with more (or even with
+    less) privilege than the user normally would be accorded 
   </t>
   <t>
     We therefore describe RPCSEC_GSS version 3 (RPCSEC_GSSv3). RPCSEC_GSSv3
@@ -55,8 +63,7 @@
       </t>
       <t>
         Multi-principal authentication of the client host and user to the server
-        done by binding two RPCSEC_GSS handles. For an example
-        see server-side copy <xref target='ref:nfsv4.2' />.
+        done by binding two RPCSEC_GSS handles.
       </t>
       <t>
         Simplified channel binding.
@@ -167,7 +174,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
 </section> <!-- Version Negotiation -->
 
-  <section title="New REPLY verifier">
+  <section anchor="ss:nrv" title="New REPLY verifier">
   <t> 
     The RPCSEC_GSSv3 child handle uses the same GSS context as the parent
     handle. Since a child and parent RPCSEC_GSSv3 handle could have the same
@@ -451,7 +458,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         the GSS-API.  
       </t>
 
-      <section anchor="ss:ca" title="Multi-principal Authentication">
+      <section title="Multi-principal Authentication">
         <t>
           &lt;CODE BEGINS&gt;
         </t>
@@ -460,8 +467,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///
    ///  struct rgss3_gss_mp_auth {
    ///          opaque          rgmp_handle<>; /* inner handle */
-   ///          opaque          rgmp_nonce<>;
-   ///          opaque          rgmp_nounc_mic<>;
+   ///          opaque          rgmp_rpcheader_mic<>;
    ///  };
    ///
           ]]></artwork>
@@ -514,28 +520,32 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           Multi-principal binding is done by including an assertion of
           type rgss3_gss_mp_auth in the RPCSEC_GSS_CREATE rgss3_create_args
-          call data. The inner context handle is place in the rbmp_handle
-          field.  A nonce and a MIC of that nounce created using the
-          GSS-API security context associated with the inner handle is also
-          provided.
+          call data. The inner context handle is placed in the rgmp_handle
+          field.  A MIC of the RPC call header up to and including the
+          credential
+          is computed using the GSS-API security context associated with
+          the inner context handle is placed in rgmp_rpcheader_mic field.
         </t>
         <t>
-          The target verifies the multi-principal authentication by verifying
-          the rgmp_nouce_mic.
-          On a successful reply, the rgss3_gss_mp_auth field in the
-          rgss3_create_res reply uses the
-          parent RPCSEC_GSSv3 context as the rgmp_handle, the same rgmp_nounce
-          as was sent in the call data with the rgmp_nounce_mic created using
-          the GSS-API security context associate with the parent handle.
-          Verification of the rbg_nounce_mic by the initiator demonstrates
-          that the target agrees to the multi-principal authentication.
+          The target verifies the multi-principal authentication by first
+          confirming that the parent context used is a client host context,
+          and then verifies the rgmp_rpcheader_mic using the GSS-API
+          security context associated with the rgmp_handle field.
+        </t>
+        <t>
+          On a successful verification, the rgss3_gss_mp_auth field in the
+          rgss3_create_res reply uses the child RPCSEC_GSSv3 context handle
+          as the rgmp_handle, and computes a MIC of the RPC reply header
+          (see section <xref target="ss:nrv"/>) using
+          the GSS-API security context associate with the child handle.
         </t>
         <t>
           On failure, the rgss3_gss_mp_auth field is not sent
           (rgss3_gss_mp_auth is an optional field).
-          A MSG_DENIED reply to an RPCSEC_GSS_CREATE formulated as usual.
-          A new value, RPCSEC_GSS_INNER_CREDPROBLEM, has been added to the
-          auth_stat type.
+          A MSG_DENIED reply to the RPCSEC_GSS_CREATE call is formulated
+          as usual.
+        </t>
+        <t>
           As described in Section 5.3.3.3 of <xref target="RFC2203" />
           the server maintains a list of contexts for the clients that are
           currently in session with it. When a client request comes in, there
@@ -546,6 +556,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           RPCSEC_GSS_CREDPROBLEM.
         </t>
         <t>
+          A new value, RPCSEC_GSS_INNER_CREDPROBLEM, has been added to the
+          auth_stat type.
           With a multi-pricipal authorization request, the server must also have
           a context corresponding to the inner context handle. When the server
           does not have a context handle corresponding to the inner
@@ -555,7 +567,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           When processing the multi-principal authentication request, if the
-          GSS_VerifyMIC() call on the inner handle nouce fails to return
+          GSS_VerifyMIC() call on the rgmp_rpcheader_mic fails to return
           GSS_S_COMPLETE, the server sends a reply status of MSG_DENIED with
           the reject_stat of AUTH_ERROR and with an auth_stat value of
           RPCSEC_GSS_INNER_CREDPROBLEM.
