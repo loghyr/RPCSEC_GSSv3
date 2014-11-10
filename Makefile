@@ -1,16 +1,23 @@
-# Copyright (C) The IETF Trust (2011-2012)
+# Copyright (C) The IETF Trust (2011-2013)
+#
+# Manage the .xml for the RPCSEC_GSS version3 document.
 #
 
 YEAR=`date +%Y`
 MONTH=`date +%B`
 DAY=`date +%d`
-PREVVERS=07
-VERS=08
-XML2RFC=/Users/andros/ietf/xml2rfc-1.36/xml2rfc.tcl
+PREVVERS=08
+VERS=09
+
+XML2RFC=xml2rfc
+
+DRAFT_BASE=draft-ietf-nfsv4-rpcsec-gssv3
+DOC_PREFIX=rpcsecgssv3
 
 autogen/%.xml : %.x
 	@mkdir -p autogen
 	@rm -f $@.tmp $@
+	@( cd dotx.d ; m4 `basename $<` > ../$@.tmp )
 	@cat $@.tmp | sed 's/^\%//' | sed 's/</\&lt;/g'| \
 	awk ' \
 		BEGIN	{ print "<figure>"; print" <artwork>"; } \
@@ -19,119 +26,145 @@ autogen/%.xml : %.x
 	| expand > $@
 	@rm -f $@.tmp
 
-all: html txt
+all: html txt dotx dotx-txt
 
 #
 # Build the stuff needed to ensure integrity of document.
-common: testx html
+common: testx dotx html dotx-txt
 
-txt: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt
+txt: ${DRAFT_BASE}-$(VERS).txt
 
-html: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html
+html: ${DRAFT_BASE}-$(VERS).html
 
-nr: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr
+nr: ${DRAFT_BASE}-$(VERS).nr
 
-xml: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
+
+#
+# Builds the I-D that has just the .x file
+#
+
+xml: ${DRAFT_BASE}-$(VERS).xml
 
 clobber:
-	$(RM) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt \
-		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html \
-		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr
-	export SPECVERS := $(VERS)
-	export VERS := $(VERS)
+	$(RM) ${DRAFT_BASE}-$(VERS).txt \
+		${DRAFT_BASE}-$(VERS).html \
+		${DRAFT_BASE}-$(VERS).nr
+	export SPECVERS=$(VERS)
+	export VERS=$(VERS)
 
 clean:
 	rm -f $(AUTOGEN)
 	rm -rf autogen
-	rm -f draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
+	rm -f ${DRAFT_BASE}-$(VERS).xml
 	rm -rf draft-$(VERS)
 	rm -f draft-$(VERS).tar.gz
 	rm -rf testx.d
 	rm -rf draft-tmp.xml
 
 # Parallel All
-pall: 
+pall:
 	$(MAKE) xml
 	( $(MAKE) txt ; echo .txt done ) & \
 	( $(MAKE) html ; echo .html done ) & \
 	wait
 
-draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
-	rm -f $@ draft-tmp.txt
-	$(XML2RFC) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.txt
-	mv draft-tmp.txt $@
+${DRAFT_BASE}-$(VERS).txt: ${DRAFT_BASE}-$(VERS).xml
+	$(XML2RFC) --text ${DRAFT_BASE}-$(VERS).xml -o $@
 
-draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
-	rm -f $@ draft-tmp.html
-	$(XML2RFC) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml draft-tmp.html
-	mv draft-tmp.html $@
+${DRAFT_BASE}-$(VERS).html: ${DRAFT_BASE}-$(VERS).xml
+	$(XML2RFC) --html ${DRAFT_BASE}-$(VERS).xml -o $@
 
-draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).nr: draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
-	rm -f $@ draft-tmp.nr
-	$(XML2RFC) draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml $@.tmp
-	mv draft-tmp.nr $@
+${DRAFT_BASE}-$(VERS).nr: ${DRAFT_BASE}-$(VERS).xml
+	$(XML2RFC) --nroff ${DRAFT_BASE}-$(VERS).xml -o $@
 
-rpcsecgssv3_front_autogen.xml: rpcsecgssv3_front.xml Makefile
-	sed -e s/DAYVAR/${DAY}/g -e s/MONTHVAR/${MONTH}/g -e s/YEARVAR/${YEAR}/g < rpcsecgssv3_front.xml > rpcsecgssv3_front_autogen.xml
+${DOC_PREFIX}_middle_errortoop_autogen.xml: ${DOC_PREFIX}_middle_errors.xml
+	./errortbl < ${DOC_PREFIX}_middle_errors.xml > ${DOC_PREFIX}_middle_errortoop_autogen.xml
 
-rpcsecgssv3_rfc_start_autogen.xml: rpcsecgssv3_rfc_start.xml Makefile
-	sed -e s/VERSIONVAR/${VERS}/g < rpcsecgssv3_rfc_start.xml > rpcsecgssv3_rfc_start_autogen.xml
+${DOC_PREFIX}_front_autogen.xml: ${DOC_PREFIX}_front.xml Makefile
+	sed -e s/DAYVAR/${DAY}/g -e s/MONTHVAR/${MONTH}/g -e s/YEARVAR/${YEAR}/g < ${DOC_PREFIX}_front.xml > ${DOC_PREFIX}_front_autogen.xml
+
+${DOC_PREFIX}_rfc_start_autogen.xml: ${DOC_PREFIX}_rfc_start.xml Makefile
+	sed -e s/DRAFTVERSION/${DRAFT_BASE}-${VERS}/g < ${DOC_PREFIX}_rfc_start.xml > ${DOC_PREFIX}_rfc_start_autogen.xml
 
 AUTOGEN =	\
-		rpcsecgssv3_front_autogen.xml \
-		rpcsecgssv3_rfc_start_autogen.xml
+		${DOC_PREFIX}_front_autogen.xml \
+		${DOC_PREFIX}_rfc_start_autogen.xml \
 
-START_PREGEN = rpcsecgssv3_rfc_start.xml
-START=	rpcsecgssv3_rfc_start_autogen.xml
-END=	rpcsecgssv3_rfc_end.xml
+START_PREGEN = ${DOC_PREFIX}_rfc_start.xml
+START=	${DOC_PREFIX}_rfc_start_autogen.xml
+END=	${DOC_PREFIX}_rfc_end.xml
 
-FRONT_PREGEN = rpcsecgssv3_front.xml
+FRONT_PREGEN = ${DOC_PREFIX}_front.xml
 
 IDXMLSRC_BASE = \
-	rpcsecgssv3_middle_start.xml \
-	rpcsecgssv3_middle_introduction.xml \
-	rpcsecgssv3_middle_iana.xml \
-	rpcsecgssv3_middle_end.xml \
-	rpcsecgssv3_back_front.xml \
-	rpcsecgssv3_back_references.xml \
-	rpcsecgssv3_back_acks.xml \
-	rpcsecgssv3_back_back.xml
+	${DOC_PREFIX}_middle_start.xml \
+	${DOC_PREFIX}_middle_introduction.xml \
+	${DOC_PREFIX}_middle_iana.xml \
+	${DOC_PREFIX}_middle_end.xml \
+	${DOC_PREFIX}_back_front.xml \
+	${DOC_PREFIX}_back_references.xml \
+	${DOC_PREFIX}_back_acks.xml \
+	${DOC_PREFIX}_back_back.xml
 
-IDCONTENTS = rpcsecgssv3_front_autogen.xml $(IDXMLSRC_BASE)
+IDCONTENTS = ${DOC_PREFIX}_front_autogen.xml $(IDXMLSRC_BASE)
 
-IDXMLSRC = rpcsecgssv3_front.xml $(IDXMLSRC_BASE)
+IDXMLSRC = ${DOC_PREFIX}_front.xml $(IDXMLSRC_BASE)
 
-draft-tmp.xml: $(START) Makefile $(END)
+draft-tmp.xml: $(START) ${DOC_PREFIX}_front_autogen.xml Makefile $(END) $(IDCONTENTS) $(AUTOGEN)
 		rm -f $@ $@.tmp
 		cp $(START) $@.tmp
 		chmod +w $@.tmp
-		for i in $(IDCONTENTS) ; do echo '<?rfc include="'$$i'"?>' >> $@.tmp ; done
+		for i in $(IDCONTENTS) ; do cat $$i >> $@.tmp ; done
 		cat $(END) >> $@.tmp
 		mv $@.tmp $@
 
-draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml: draft-tmp.xml $(IDCONTENTS) $(AUTOGEN)
+${DRAFT_BASE}-$(VERS).xml: draft-tmp.xml $(IDCONTENTS) $(AUTOGEN)
 		rm -f $@
-		cp draft-tmp.xml $@
+		./rfcincfill.pl draft-tmp.xml $@
 
-genhtml: Makefile gendraft html txt draft-$(VERS).tar
+genhtml: Makefile gendraft html txt dotx dotx-txt draft-$(VERS).tar
 	./gendraft draft-$(PREVVERS) \
-		draft-ietf-nfsv4-rpcsec-gssv3-$(PREVVERS).txt \
+		${DRAFT_BASE}-$(PREVVERS).txt \
 		draft-$(VERS) \
-		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt \
-		draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html \
-		draft-ietf-nfsv4-rpcsec-gssv3-dot-x-04.txt \
-		draft-ietf-nfsv4-rpcsec-gssv3-dot-x-05.txt \
+		${DRAFT_BASE}-$(VERS).txt \
+		${DRAFT_BASE}-$(VERS).html \
+		dotx.d/nfsv42.x \
 		draft-$(VERS).tar.gz
 
-testx: 
+testx:
 	rm -rf testx.d
 	mkdir testx.d
+	$(MAKE) dotx
+	# In Linux, authunix is still used.
+	# In Linux, the RPCSEC_GSS library/API has
+	# a conflicting data type.
+	# In Linux, the gssapi and RPCSEC_GSS headers
+	# are placed in bizarre places.
+	# In Linux, rpcgen produces a makefile name that
+	# just *has* to be different from Solaris.
+	( \
+		if [ -f /usr/include/rpc/auth_sys.h ]; then \
+			cp dotx.d/nfsv42.x testx.d ; \
+		else \
+			sed s/authsys/authunix/g < dotx.d/nfsv42.x | \
+			sed s/auth_sys/auth_unix/g | \
+			sed s/AUTH_SYS/AUTH_UNIX/g | \
+			sed s/gss_svc/Gss_Svc/g > testx.d/nfsv42.x ; \
+		fi ; \
+	)
 	( cd testx.d ; \
-		rpcgen -a rpcsecgssv3.x ; \
+		rpcgen -a nfsv42.x ; )
+	( cd testx.d ; \
+		rpcgen -a nfsv42.x ; \
+		if [ ! -f /usr/include/rpc/auth_sys.h ]; then \
+			ln Make* make ; \
+			CFLAGS="-I /usr/include/gssglue -I /usr/include/tirpc" ; export CFLAGS ; \
+		fi ; \
 		$(MAKE) -f make* )
 
 spellcheck: $(IDXMLSRC)
-	for f in $(IDXMLSRC); do echo "Spell Check of $$f"; spell +dictionary.txt $$f; done
+	for f in $(IDXMLSRC); do echo "Spell Check of $$f"; aspell check -p dictionary.pws $$f; done
+	cd dotx-id.d ; SPECVERS=$(VERS) $(MAKE) spellcheck
 
 AUXFILES = \
 	dictionary.txt \
@@ -143,11 +176,11 @@ AUXFILES = \
 	xml2rfc
 
 DRAFTFILES = \
-	draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).txt \
-	draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).html \
-	draft-ietf-nfsv4-rpcsec-gssv3-$(VERS).xml
+	${DRAFT_BASE}-$(VERS).txt \
+	${DRAFT_BASE}-$(VERS).html \
+	${DRAFT_BASE}-$(VERS).xml
 
-draft-$(VERS).tar: $(IDCONTENTS) $(START_PREGEN) $(FRONT_PREGEN) $(AUXFILES) $(DRAFTFILES)
+draft-$(VERS).tar: $(IDCONTENTS) $(START_PREGEN) $(FRONT_PREGEN) $(AUXFILES) $(DRAFTFILES) dotx.d/nfsv4.x
 	rm -f draft-$(VERS).tar.gz
 	tar -cvf draft-$(VERS).tar \
 		$(START_PREGEN) \
@@ -156,4 +189,6 @@ draft-$(VERS).tar: $(IDCONTENTS) $(START_PREGEN) $(FRONT_PREGEN) $(AUXFILES) $(D
 		$(IDCONTENTS) \
 		$(AUXFILES) \
 		$(DRAFTFILES) \
+		`cat dotx.d/tmp.filelist` \
+		`cat dotx-id.d/tmp.filelist`; \
 		gzip draft-$(VERS).tar
