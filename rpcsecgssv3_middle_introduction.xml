@@ -411,7 +411,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///  };
    ///
    ///  struct rgss3_assertion {
-   ///          bool                 ra_critical;
    ///          rgss3_assertion_u    ra_assertion;
    ///  };
    ///
@@ -534,8 +533,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           On a successful verification, the rgss3_gss_mp_auth field in the
-          rgss3_create_res reply uses the child RPCSEC_GSSv3 context handle
-          as the rgmp_handle, and computes a MIC of the RPC reply header
+          rgss3_create_res reply MUST be filled in with the child
+          RPCSEC_GSSv3 context handle
+          as the rgmp_handle, and a MIC computed over the RPC reply header
           (see section <xref target="ss:nrv"/>) using
           the GSS-API security context associate with the child handle.
         </t>
@@ -599,18 +599,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           The client discovers which labels the server supports via the
           RPCSEC_GSS_LIST control message.
-        </t>
-        <t>
-          RPCSEC_GSSv3 clients MAY assert a server security label in some LSF by
-          binding a label assertion to the RPCSEC_GSSv3 context handle.  This is
-          done by including an assertion of type rgss3_label in the
-          RPCSEC_GSS_CREATE rgss3_create_args rca_assertions call data.
-        </t>
-        <t>
-          The labels that are accepted by the target and bound to the
-          RPCSEC_GSSv3 context will be enumerated
-          in the rcr_assertions field of the rgss3_create_res
-          RPCSEC_GSS_CREATE reply.
+          Asserting a server supported label via RPCSEC_GSS_CREATE
+          enables server guest mode labels. 
+          Full mode is enabled when an RPCSEC_GSS_CREATE label assertion is
+          combined with asserting the same label with the NFSv4.2
+          sec_label attribute.
         </t>
         <t>
           Label encoding is specified to mirror the NFSv4.2 sec_label attribute
@@ -624,13 +617,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           model to interpret and enforce.
         </t>
         <t>
-          Asserting a server supported label via RPCSEC_GSS_CREATE
-          enables server guest mode labels. 
-          Full mode is enabled when an RPCSEC_GSS_CREATE label assertion is
-          combined with asserting the same label with the NFSv4.2
-          sec_label attribute.
-        </t>
-        <t>
           If a label itself requires privacy protection (i.e., that the user
           can assert that label is a secret) then the client MUST use the
           rpc_gss_svc_privacy protection service for the RPCSEC_GSS_CREATE
@@ -638,20 +624,27 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           provides privacy protection, rpc_gss_svc_channel_prot.
         </t>
         <t>
-          If a client wants to ensure that the server understands the asserted
-          label then it MUST set the 'critical' field of the label assertion to
-          TRUE, otherwise it MUST set it to FALSE.
+          RPCSEC_GSSv3 clients MAY assert a server security label in some LSF by
+          binding a label assertion to the RPCSEC_GSSv3 context handle.  This is
+          done by including an assertion of type rgss3_label in the
+          RPCSEC_GSS_CREATE rgss3_create_args rca_assertions call data.
         </t>
         <t>
-          Servers that do not support labeling MUST ignore non-critical label
-          assertions.  Servers that do not support the requested LFS MUST either
-          ignore non-critical label assertions or map them to a suitable label
-          in a supported LFS.  Servers that do not support labeling or do not
-          support the requested LFS MUST return an error if the label request
-          is critical.  Servers that support labeling in the requested LFS MAY
+          Servers that support labeling in the requested LFS MAY
           map the requested label to different label as a result of server-side
           policy evaluation.
         </t>
+        <t>
+          The labels that are accepted by the target and bound to the
+          RPCSEC_GSSv3 context MUST be enumerated in the rcr_assertions
+          field of the rgss3_create_res RPCSEC_GSS_CREATE reply.
+        </t>
+        <t>
+          Servers that do not support labeling or that do not support the
+          requested LFS reject the label assertion with a reply status of
+          MSG_DENIED, a reject_status of AUTH_ERROR, and an auth_stat of
+          RPCSEC_GSS_LABEL_PROBLEM.
+	</t>
       </section> <!-- Label Assertions -->
 
       <section anchor="ss:pa" title="Structured Privilege Assertions">
@@ -680,7 +673,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           privileges are described by the RPC application definition.
         </t>
         <t>
-          A successful structured privilege assertion will be enumerated in
+          A successful structured privilege assertion MUST be enumerated in
           the rcr_assertions field of the rgss3_create_res
           RPCSEC_GSS_CREATE reply.
         </t>
@@ -853,8 +846,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     <section anchor="ss:extens" title="Extensibility">
       <t>
         Assertion types may be added in the future by adding arms to the
-        'rgss3_assertion_u' union.  Every assertion has a 'critical' flag
-        that can be used to indicate criticality.
+        'rgss3_assertion_u' union. 
         Other assertion types are described elsewhere and include:
         <list style='symbols'>
           <t>
@@ -874,10 +866,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </t>
       <t>
         New control message types may be added.
-      </t>
-      <t>
-        Servers receiving unknown critical client assertions MUST return
-        an error.
       </t>
     </section> <!-- Extensibility -->
 
@@ -911,11 +899,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <t>
     The security semantics of assertions carried by RPCSEC_GSSv3 are
     application protocol-specific.
-  </t>
-  <t>
-    RPCSEC_GSSv3 supports a notion of critical assertions
-    but there's no need for peers to tell each other what
-    assertions were granted, or what they were mapped to.
   </t>
   <t>
     Note that RPSEC_GSSv3 is not a complete solution for labeling: it
