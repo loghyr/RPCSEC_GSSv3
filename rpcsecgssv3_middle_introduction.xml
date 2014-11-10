@@ -306,6 +306,14 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
   </section> <!-- New Version Number -->
 
+  <section  title="RPCSEC_GSS_BIND_CHANNEL Operation Deprecated">
+    <t>
+      RPCSEC_GSSv3 provides a channel binding assertion that replaces
+      the RPCSEC_GSSv2 RPCSEC_GSS_BIND_CHANNEL operation.
+      RPCSEC_GSS_BIND_CHANNEL MUST NOT be used on RPCSEC_GSS version 3 handles.
+    </t>
+  </section> <!-- RPCSEC_GSS_BIND_CHANNEL Deprecated -->
+
   <section anchor="ss:nasv" title="New auth_stat Values">
     <t>
       RPCSEC_GSSv3 requires the addition of several values to the auth_stat
@@ -362,7 +370,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       <list style='symbols'>
         <t>
           rpc_gss_svc_channel_prot (see
-          <xref target="RFC5403">RPCSEC_GSSv2</xref>)
+          <xref target="RFC5403">RPCSEC_GSSv2</xref>) 
         </t>
         <t>
           rpc_gss_svc_integrity
@@ -429,10 +437,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
             Multi-principal authentication: another RPCSEC_GSS context handle
           </t>
           <t>
-            Authorization assertions: labels and or privileges
+            A channel binding
           </t>
           <t>
-            A channel binding
+            Authorization assertions: labels and or privileges
           </t>
         </list>
         The reply to this message consists of either an error or an
@@ -575,124 +583,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
       </section> <!-- Multi-principal Authentication -->
 
-      <section anchor="ss:la" title="Label Assertions">
-        <t>
-          &lt;CODE BEGINS&gt;
-        </t>
-        <figure>
-          <artwork><![CDATA[
-   ///  struct rgss3_label {
-   ///          rgss3_lfs       rl_lfs;
-   ///          opaque          rl_label<>;
-   ///  };
-   ///
-   ///  struct rgss3_lfs {
-   ///          unsigned int rlf_lfs_id;
-   ///          unsigned int rlf_pi_id;
-   ///  };
-   ///
-          ]]></artwork>
-        </figure>
-        <t>
-          &lt;CODE ENDS&gt;
-        </t>
-        <t>
-          The client discovers which labels the server supports via the
-          RPCSEC_GSS_LIST control message.
-          Asserting a server supported label via RPCSEC_GSS_CREATE
-          enables server guest mode labels. 
-          Full mode is enabled when an RPCSEC_GSS_CREATE label assertion is
-          combined with asserting the same label with the NFSv4.2
-          sec_label attribute.
-        </t>
-        <t>
-          Label encoding is specified to mirror the NFSv4.2 sec_label attribute
-          described in Section 12.2.2 of <xref target='ref:nfsv4.2' />. The 
-          label format specifier (LFS) is an identifier used by the client to
-          establish the syntactic format of the security label and the
-          semantic meaning of its components. The policy identifier (PI) is
-          an optional part of the definition of an LFS which allows for
-          clients and server to identify specific security policies.
-          The opaque label field of rgss3_label is dependent on the MAC
-          model to interpret and enforce.
-        </t>
-        <t>
-          If a label itself requires privacy protection (i.e., that the user
-          can assert that label is a secret) then the client MUST use the
-          rpc_gss_svc_privacy protection service for the RPCSEC_GSS_CREATE
-          request or, if the parent handle is bound to a secure channel that
-          provides privacy protection, rpc_gss_svc_channel_prot.
-        </t>
-        <t>
-          RPCSEC_GSSv3 clients MAY assert a server security label in some LSF by
-          binding a label assertion to the RPCSEC_GSSv3 context handle.  This is
-          done by including an assertion of type rgss3_label in the
-          RPCSEC_GSS_CREATE rgss3_create_args rca_assertions call data.
-        </t>
-        <t>
-          Servers that support labeling in the requested LFS MAY
-          map the requested label to different label as a result of server-side
-          policy evaluation.
-        </t>
-        <t>
-          The labels that are accepted by the target and bound to the
-          RPCSEC_GSSv3 context MUST be enumerated in the rcr_assertions
-          field of the rgss3_create_res RPCSEC_GSS_CREATE reply.
-        </t>
-        <t>
-          Servers that do not support labeling or that do not support the
-          requested LFS reject the label assertion with a reply status of
-          MSG_DENIED, a reject_status of AUTH_ERROR, and an auth_stat of
-          RPCSEC_GSS_LABEL_PROBLEM.
-	</t>
-      </section> <!-- Label Assertions -->
-
-      <section anchor="ss:pa" title="Structured Privilege Assertions">
-        <t>
-          &lt;CODE BEGINS&gt;
-        </t>
-        <figure>
-          <artwork><![CDATA[
-   ///
-   ///  struct rgss3_privs {
-   ///          string          rp_name<>; /* human readable */
-   ///          opaque          rp_privilege<>;
-   ///  };
-          ]]></artwork>
-        </figure>
-        <t>
-          &lt;CODE ENDS&gt;
-        </t>
-        <t>
-          A structured privilege is an RPC application defined privilege.
-          RPCSEC_GSSv3 clients MAY assert a structured privilege by binding
-          the privilege to the RPCSEC_GSSv3 context handle.  This is done by
-          including an assertion of type rgss3_privs in the RPCSEC_GSS_CREATE
-          rgss3_create_args rca_assertions call data.
-          Encoding, server verification and any policies for structured
-          privileges are described by the RPC application definition.
-        </t>
-        <t>
-          A successful structured privilege assertion MUST be enumerated in
-          the rcr_assertions field of the rgss3_create_res
-          RPCSEC_GSS_CREATE reply.
-        </t>
-	<t>
-          If a server receives a structured privilege assertion that it
-          does not recognize the assertion is rejected with MSG_DENIED,
-          a reject_status of AUTH_ERROR, and an auth_stat of
-          RPCSEC_GSS_UNKNOWN_MESSAGE. If the server fails the RPC application
-          defined server verification for a structured privilege, the
-          assertion is rejected with MSG_DENIED, a reject_status of AUTH_ERROR,
-          and an auth_stat of RPCSEC_GSS_PRIVILEGE_PROBLEM.
-        </t>
-        <t>
-          Section 3.4.1.2. "Inter-Server Copy with RPCSEC_GSSv3"
-          of <xref target='ref:nfsv4.2' /> shows an example of structured
-          privilege definition and use.
-        </t>
-      </section> <!-- Structured Privilege Assertions -->
-
       <section anchor="ss:cb" title="Channel Binding">
         <t>
           &lt;CODE BEGINS&gt;
@@ -788,6 +678,123 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           rpc_gss_svc_privacy where privacy protection is needed or desired.
         </t>
       </section> <!-- Channel Binding -->
+
+      <section anchor="ss:la" title="Label Assertions">
+        <t>
+          &lt;CODE BEGINS&gt;
+        </t>
+        <figure>
+          <artwork><![CDATA[
+   ///  struct rgss3_label {
+   ///          rgss3_lfs       rl_lfs;
+   ///          opaque          rl_label<>;
+   ///  };
+   ///
+   ///  struct rgss3_lfs {
+   ///          unsigned int rlf_lfs_id;
+   ///          unsigned int rlf_pi_id;
+   ///  };
+   ///
+          ]]></artwork>
+        </figure>
+        <t>
+          &lt;CODE ENDS&gt;
+        </t>
+        <t>
+          The client discovers which labels the server supports via the
+          RPCSEC_GSS_LIST control message.
+          Asserting a server supported label via RPCSEC_GSS_CREATE
+          enables server guest mode labels. 
+          Full mode is enabled when an RPCSEC_GSS_CREATE label assertion is
+          combined with asserting the same label with the NFSv4.2
+          sec_label attribute.
+        </t>
+        <t>
+          Label encoding is specified to mirror the NFSv4.2 sec_label attribute
+          described in Section 12.2.2 of <xref target='ref:nfsv4.2' />. The 
+          label format specifier (LFS) is an identifier used by the client to
+          establish the syntactic format of the security label and the
+          semantic meaning of its components. The policy identifier (PI) is
+          an optional part of the definition of an LFS which allows for
+          clients and server to identify specific security policies.
+          The opaque label field of rgss3_label is dependent on the MAC
+          model to interpret and enforce.
+        </t>
+        <t>
+          If a label itself requires privacy protection (i.e., that the user
+          can assert that label is a secret) then the client MUST use the
+          rpc_gss_svc_privacy protection service for the RPCSEC_GSS_CREATE
+          request.
+        </t>
+        <t>
+          RPCSEC_GSSv3 clients MAY assert a server security label in some LSF by
+          binding a label assertion to the RPCSEC_GSSv3 context handle.  This is
+          done by including an assertion of type rgss3_label in the
+          RPCSEC_GSS_CREATE rgss3_create_args rca_assertions call data.
+        </t>
+        <t>
+          Servers that support labeling in the requested LFS MAY
+          map the requested label to different label as a result of server-side
+          policy evaluation.
+        </t>
+        <t>
+          The labels that are accepted by the target and bound to the
+          RPCSEC_GSSv3 context MUST be enumerated in the rcr_assertions
+          field of the rgss3_create_res RPCSEC_GSS_CREATE reply.
+        </t>
+        <t>
+          Servers that do not support labeling or that do not support the
+          requested LFS reject the label assertion with a reply status of
+          MSG_DENIED, a reject_status of AUTH_ERROR, and an auth_stat of
+          RPCSEC_GSS_LABEL_PROBLEM.
+	</t>
+      </section> <!-- Label Assertions -->
+
+      <section anchor="ss:pa" title="Structured Privilege Assertions">
+        <t>
+          &lt;CODE BEGINS&gt;
+        </t>
+        <figure>
+          <artwork><![CDATA[
+   ///
+   ///  struct rgss3_privs {
+   ///          string          rp_name<>; /* human readable */
+   ///          opaque          rp_privilege<>;
+   ///  };
+          ]]></artwork>
+        </figure>
+        <t>
+          &lt;CODE ENDS&gt;
+        </t>
+        <t>
+          A structured privilege is an RPC application defined privilege.
+          RPCSEC_GSSv3 clients MAY assert a structured privilege by binding
+          the privilege to the RPCSEC_GSSv3 context handle.  This is done by
+          including an assertion of type rgss3_privs in the RPCSEC_GSS_CREATE
+          rgss3_create_args rca_assertions call data.
+          Encoding, server verification and any policies for structured
+          privileges are described by the RPC application definition.
+        </t>
+        <t>
+          A successful structured privilege assertion MUST be enumerated in
+          the rcr_assertions field of the rgss3_create_res
+          RPCSEC_GSS_CREATE reply.
+        </t>
+	<t>
+          If a server receives a structured privilege assertion that it
+          does not recognize the assertion is rejected with MSG_DENIED,
+          a reject_status of AUTH_ERROR, and an auth_stat of
+          RPCSEC_GSS_UNKNOWN_MESSAGE. If the server fails the RPC application
+          defined server verification for a structured privilege, the
+          assertion is rejected with MSG_DENIED, a reject_status of AUTH_ERROR,
+          and an auth_stat of RPCSEC_GSS_PRIVILEGE_PROBLEM.
+        </t>
+        <t>
+          Section 3.4.1.2. "Inter-Server Copy with RPCSEC_GSSv3"
+          of <xref target='ref:nfsv4.2' /> shows an example of structured
+          privilege definition and use.
+        </t>
+      </section> <!-- Structured Privilege Assertions -->
 
     </section> <!-- New Control Procedure - RPCSEC_GSS_CREATE -->
 
