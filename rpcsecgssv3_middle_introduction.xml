@@ -183,10 +183,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     opportunities for man in the middle attacks.
   </t>
   <t>
-    This is easily addressed: RPCSEC_GSS version 3 MUST change the verifier of
+    This is easily addressed: RPCSEC_GSS version 3 changes the verifier of
     the reply to compute the verifier using the exact same input as that is
     used for verifier of the request, except for the mtype change from CALL
-    to REPLY. The new reply verifier computes a MIC over the following data:
+    to REPLY. The new reply verifier computes a MIC over the following RPC
+    reply header data:
     <figure>
       <artwork>
   unsigned int xid;
@@ -354,7 +355,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
     <t>
       RPCSEC_GSS version 3 control messages are similar to the
-      RPCSEC_GSS version 1 and version2
+      RPCSEC_GSS version 1 and version 2
       RPCSEC_GSS_DESTROY control message (see section 5.4
       <xref target="RFC2203" />) in that the sequence number
       in the request must be valid, and the header checksum in the verifier
@@ -485,21 +486,22 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         <t>
           RPCSEC_GSSv3 clients MAY assert a multi-principal authentication of
           the client host principal and a user principal.
-          This feature is needed, for example, when a client wishes to use
-          authority assertions that the server may only grant if a user and a
-          client are authenticated together to the server.  Thus a server may
-          refuse to grant requested authority to a user acting alone (e.g., via
-          an unprivileged user-space program), or to a client acting alone
-          (e.g. when a client is acting on behalf of a user) but may grant
-          requested authority to a client acting on behalf of a user if the
-          server identifies the user and trusts the client.
+          This feature is needed, for example, when an RPC client wishes to use
+          authority assertions that the server may only grant if a user and an
+          RPC client are authenticated together to the server.  Thus a server
+          may refuse to grant requested authority to a user acting alone
+          (e.g., via an unprivileged user-space program), or to an RPC client
+          acting alone (e.g. when an RPC client is acting on behalf of a user)
+          but may grant requested authority to an RPC client acting on behalf
+          of a user if the server identifies the user and trusts the RPC client.
         </t>
         <t>
           It is assumed that an unprivileged user-space program would not have
-          access to client host credentials needed to establish a GSS-API
-          security context authenticating the client to the server, therefore
+          access to RPC client host credentials needed to establish a GSS-API
+          security context authenticating the RPC client to the server,
+          therefore
           an unprivileged user-space program could not create an RPCSEC_GSSv3
-          RPCSEC_GSS_CREATE message that successfully binds a client and a
+          RPCSEC_GSS_CREATE message that successfully binds an RPC client and a
           user security context.
         </t>
         <t>
@@ -509,20 +511,21 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           termed the "inner" handle.
           Clients using RPCSEC_GSSv3 multi-principal authentication MUST use
           an RPCSEC_GSSv3 context handle that corresponds to a
-          GSS-API security context that authenticates the client host for
+          GSS-API security context that authenticates the RPC client host for
           the parent handle. The inner context handle it SHOULD use a context
           handle to authenticate a user.  The reverse (parent handle
-          authenticates user, inner authenticates client) MUST NOT be used.
+          authenticates user, inner authenticates an RPC client) MUST NOT
+          be used.
           Other multi-principal parent and inner context handle uses might
-          eventually make sense.
+          eventually make sense, but would need to be introduced in a new
+          revision of the RPCSEC_GSS protocol.
         </t>
         <t>
-          An inner RPCSEC_GSSv3 context handle that is bound to a parent
-          RPCSEC_GSS context through multi-principal authentication
-          MUST be treated by servers as authenticating the
-          GSS-API initiator principal authenticated by the inner context
-          handle's GSS-API security context.  This principal may be mapped
-          to a server-side notion of user or principal.
+          The child context handle returned by a successful multi-principal
+          assertion binds the inner RPCSEC_GSSv3 context handle to the parent
+          RPCSEC_GSS context and MUST be treated by servers as authenticating
+          the GSS-API initiator principal authenticated by the inner context
+          handle's GSS-API security context.  This principal may be mapped to a server-side notion of user or principal.
         </t>
         <t>
           Multi-principal binding is done by including an assertion of
@@ -625,7 +628,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           channel bindings data octet string with the channel type as described
           in <xref target="RFC5056" />, then the client calls GSS_GetMIC()
           to get a MIC of
-          resulting octet string, using the RPCSEC_GSSv3 context handle's
+          resulting octet string, using the parent RPCSEC_GSSv3 context handle's
           GSS-API security context.  The MIC is then placed in the
           rca_chan_bind_mic field of RPCSEC_GSS_CREATE arguments
           (rgss3_create_args).
@@ -651,8 +654,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           call RPCSEC_GSS_DESTROY.  If the client requested channel binding
           but the server did not include an rcr_chan_binding_mic field in the
           results, then the client MAY continue to use the resulting context
-          handle as though channel binding had never been requested, otherwise
-          (if the client really wanted channel binding) it MUST call
+          handle as though channel binding had never been requested. 
+          If the client considers channel binding critical, it MUST call
           RPCSEC_GSS_DESTROY.
         </t>
         <t>
@@ -782,11 +785,17 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
 	<t>
           If a server receives a structured privilege assertion that it
-          does not recognize the assertion is rejected with MSG_DENIED,
+          does not recognize the assertion is rejected with a reply
+          status of MSG_DENIED,
           a reject_status of AUTH_ERROR, and an auth_stat of
-          RPCSEC_GSS_UNKNOWN_MESSAGE. If the server fails the RPC application
-          defined server verification for a structured privilege, the
-          assertion is rejected with MSG_DENIED, a reject_status of AUTH_ERROR,
+          RPCSEC_GSS_UNKNOWN_MESSAGE.
+	</t>
+	<t>
+          If a server receives a structured privilege assertion that it
+          fails to verify according to the requirements of the RPC
+          application defined behavior, the
+          assertion is rejected with a reply status of MSG_DENIED, a
+          reject_status of AUTH_ERROR,
           and an auth_stat of RPCSEC_GSS_PRIVILEGE_PROBLEM.
         </t>
         <t>
@@ -897,7 +906,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <t>
     The RPCSEC_GSSv3 protocol allows for client-side assertions of data
     that is relevant to server-side authorization decisions.  These
-    assertions must be evaludated by the server in the context of whether
+    assertions must be evaluated by the server in the context of whether
     the client and/or user are authenticated, whether multi-principal
     authentication was used, whether the client is trusted, what ranges
     of assertions are allowed for the client and the user (separately or
