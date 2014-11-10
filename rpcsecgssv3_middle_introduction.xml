@@ -47,7 +47,7 @@
         Security labels for multi-level, type enforcement, and other
         labeled security models. See <xref target='ref:rh_mls' />,
         <xref target='DTOS' />, <xref target='SENFSV3' />,
-        <xref target='ref:nfsv4.2' /> and <xref target='ref:lnfs_req' />.
+        <xref target='ref:nfsv4.2' /> and <xref target='RFC7204' />.
       </t>
       <t>
         Application-specific structured privileges. For an example

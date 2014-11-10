@@ -210,7 +210,20 @@
       <format type='TXT' octets='50937' target='ftp://ftp.isi.edu/in-notes/rfc5403.txt' />
     </reference>
 
-  
+    <reference anchor="RFC7204">
+      <front>
+        <title>
+          Requirements for Labeled NFS
+        </title>
+        <author initials='T.' surname='Haynes' fullname='T. Haynes'>
+          <organization>NetApp</organization>
+        </author>
+        <date year='2014' month='April' />
+      </front>
+      <seriesInfo name='RFC' value='7204' />
+      <format type='TXT' octets='50937' target='ftp://ftp.isi.edu/in-notes/rfc7204.txt' />
+    </reference>
+
         
 </references>
 
@@ -240,6 +253,7 @@ target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
       National Security Agency
       </organization>
     </author>
+    <date year='2000' />
   </front>
 </reference>
 
@@ -261,6 +275,7 @@ target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
           <email>jwcart2@tycho.nsa.gov</email>
         </address>
       </author>
+      <date year='2005' />
     </front>
   </reference>
 
@@ -273,18 +288,6 @@ target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
         <date year="2011" />
       </front>
       <seriesInfo name="draft-quigley-label-format-registry" value="(work in progress)"/>
-    </reference>
-
-    <reference anchor="ref:lnfs_req">
-      <front>
-        <title>
-          Requirements for Labeled NFS
-        </title>
-        <author initials='T.' surname='Haynes' fullname='T. Haynes'>
-          <organization />
-        </author>
-      </front>
-      <seriesInfo name="draft-ietf-nfsv4-labreqs-05" value="(work in progress)" />
     </reference>
 
 </references>
