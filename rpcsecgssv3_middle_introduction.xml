@@ -103,9 +103,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     &lt;CODE BEGINS&gt;
   </t>
   <figure>
-    <artwork>
+    <artwork><![CDATA[
  sh extract.sh < spec.txt > rpcsec_gss_v3.x
-    </artwork>
+    ]]></artwork>
   </figure>
   <t>
     &lt;CODE ENDS&gt;
@@ -198,7 +198,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       &lt;CODE BEGINS&gt;
     </t>
     <figure>
-      <artwork>
+      <artwork><![CDATA[
    ///  /*
    ///   * Copyright (c) 2013 IETF Trust and the persons
    ///   * identified as the document authors. All rights
@@ -284,7 +284,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          rpc_gss_cred_vers_1_t rgc_cred_v1;
    ///  };
    ///
-      </artwork>
+      ]]></artwork>
     </figure>
     <t>
       &lt;CODE ENDS&gt;
@@ -374,7 +374,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         &lt;CODE BEGINS&gt;
       </t>
       <figure>
-        <artwork>
+        <artwork><![CDATA[
    ///  struct rgss3_create_args {
    ///          rgss3_gss_mp_auth    *rca_mp_auth;
    ///          rgss3_chan_binding   *rca_chan_bind_mic;
@@ -408,7 +408,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          rgss3_assertion_u    ra_assertion;
    ///  };
    ///
-        </artwork>
+        ]]></artwork>
       </figure>
       <t>
         &lt;CODE ENDS&gt;
@@ -456,7 +456,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           &lt;CODE BEGINS&gt;
         </t>
         <figure>
-          <artwork>
+          <artwork><![CDATA[
    ///
    ///  struct rgss3_gss_mp_auth {
    ///          opaque          rgmp_handle<>; /* inner handle */
@@ -464,7 +464,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          opaque          rgmp_nounc_mic<>;
    ///  };
    ///
-          </artwork>
+          ]]></artwork>
         </figure>
         <t>
           &lt;CODE ENDS&gt;
@@ -568,7 +568,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           &lt;CODE BEGINS&gt;
         </t>
         <figure>
-          <artwork>
+          <artwork><![CDATA[
    ///  struct rgss3_label {
    ///          rgss3_lfs       rl_lfs;
    ///          opaque          rl_label<>;
@@ -579,7 +579,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          unsigned int rlf_pi_id;
    ///  };
    ///
-          </artwork>
+          ]]></artwork>
         </figure>
         <t>
           &lt;CODE ENDS&gt;
@@ -647,13 +647,13 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           &lt;CODE BEGINS&gt;
         </t>
         <figure>
-          <artwork>
+          <artwork><![CDATA[
    ///
    ///  struct rgss3_privs {
    ///          string          rp_name<>; /* human readable */
    ///          opaque          rp_privilege<>;
    ///  };
-          </artwork>
+          ]]></artwork>
         </figure>
         <t>
           &lt;CODE ENDS&gt;
@@ -693,11 +693,11 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           &lt;CODE BEGINS&gt;
         </t>
         <figure>
-          <artwork>
+          <artwork><![CDATA[
    ///
    ///  typedef opaque rgss3_chan_binding<>;
    ///
-          </artwork>
+          ]]></artwork>
         </figure>
         <t>
           &lt;CODE ENDS&gt;
@@ -791,7 +791,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         &lt;CODE BEGINS&gt;
       </t>
       <figure>
-        <artwork>
+        <artwork><![CDATA[
    ///  enum rgss3_list_item {
    ///          LABEL = 0,
    ///          PRIVS = 1
@@ -813,14 +813,14 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///
    ///  typedef rgss3_list_item_u rgss3_list_res<>;
    ///
-        </artwork>
+        ]]></artwork>
       </figure>
       <t>
         &lt;CODE ENDS&gt;
       </t>
       <t>
         The call data for an RPCSEC_GSS_LIST request consists of a list
-        of integers (rla_list_what<>) indicating what assertions to be listed,
+        of integers (rla_list_what) indicating what assertions to be listed,
         and the reply consists of an error or the requested list.
       </t>
       <t>
