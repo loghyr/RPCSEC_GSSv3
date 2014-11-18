@@ -43,7 +43,7 @@
     with a single cache manager can fetch and cache data on a users'
     behalf, and re-display it for another user from the cache without
     re-fetching the data from the server.
-    The initial data aquisition is authenticated by the first user's
+    The initial data acquisition is authenticated by the first user's
     credentials, and if only that user's credentials are used, it may be
     possible for a malicious user or users to "poison" the cache for
     other users by introducing bogus data into the cache.
@@ -885,9 +885,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
             </list>
           </t>
         </list>
-      </t>
-      <t>
-        New control message types may be added.
       </t>
     </section> <!-- Extensibility -->
 
