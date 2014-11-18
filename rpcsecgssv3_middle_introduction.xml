@@ -841,8 +841,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          rgss3_label          rli_labels<>;
    ///  case PRIVS:
    ///          rgss3_privs          rli_privs<>;
-   ///  default:
-   ///          opaque               rli_ext<>;
    ///  };
    ///
    ///  typedef rgss3_list_item_u rgss3_list_res<>;
@@ -856,11 +854,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         The call data for an RPCSEC_GSS_LIST request consists of a list
         of integers (rla_list_what) indicating what assertions to be listed,
         and the reply consists of an error or the requested list.
-      </t>
-      <t>
-        <cref anchor='AI3' source='AA'>
-          What good is the rli_ext field? How should we describe it's use?   
-        </cref>
       </t>
       <t>
         The result of requesting a list of rgss3_list_item LABEL 
