@@ -551,17 +551,17 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           The target verifies the multi-principal authentication by first
-          confirming that the parent context used is a client host context,
+          confirming that the parent context used is an RPC client host context,
           and then verifies the rgmp_rpcheader_mic using the GSS-API
           security context associated with the rgmp_handle field.
         </t>
         <t>
           On a successful verification, the rgss3_gss_mp_auth field in the
-          rgss3_create_res reply MUST be filled in with the child
+          rgss3_create_res reply MUST be filled in with the inner
           RPCSEC_GSSv3 context handle
           as the rgmp_handle, and a MIC computed over the RPC reply header
           (see section <xref target="ss:nrv"/>) using
-          the GSS-API security context associate with the child handle.
+          the GSS-API security context associated with the inner handle.
         </t>
         <t>
           On failure, the rgss3_gss_mp_auth field is not sent
