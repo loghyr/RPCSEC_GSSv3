@@ -290,5 +290,14 @@ target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
       <seriesInfo name="draft-quigley-label-format-registry" value="(work in progress)"/>
     </reference>
 
+    <reference anchor="ref:rxgk">
+      <front>
+        <title>Integrating rxgk with AFS</title>
+        <author initials="S." surname="Wilkinson" />
+        <author initials="B." surname="Kaduk" />
+        <date year='2014' month='April' />
+      </front>
+      <seriesInfo name="draft-wilkinson-afs3-rxgk-afs" value="(work in progress)"/>
+    </reference>
 </references>
 

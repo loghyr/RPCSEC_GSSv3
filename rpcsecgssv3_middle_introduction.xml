@@ -37,13 +37,23 @@
     source on behalf of the user.
   </t>
   <t>
-    XXX Nico review this paragraph please XXXX.
-    Multi-principal assertions can be used to address the "user can
-    impersonate the server to the client" problem and cache poisoning
-    attacks on the client by the user. Another use is the secure conveyance
-    of privilege information for processes running with more (or even with
-    less) privilege than the user normally would be accorded 
+    Multi-principal assertions can be used to address shared cache
+    poisoning attacks on the client cache by a user. As described
+    in <xref target="ref:rxgk"> Section 7 </xref>, multi-user machines
+    with a single cache manager can fetch and cache data on a users'
+    behalf, and re-display it for another user from the cache without
+    re-fetching the data from the server.
+    The initial data aquisition is authenticated by the first user's
+    credentials, and if only that user's credentials are used, it may be
+    possible for a malicious user or users to "poison" the cache for
+    other users by introducing bogus data into the cache.
   </t>
+  <t>
+    Another use of the multi-principal assertion is the secure conveyance
+    of privilege information for processes running with more (or even with
+    less) privilege than the user normally would be accorded. 
+  </t>
+
   <t>
     We therefore describe RPCSEC_GSS version 3 (RPCSEC_GSSv3). RPCSEC_GSSv3
     is the same as <xref target="RFC5403">RPCSEC_GSSv2</xref>, except that
