@@ -17,7 +17,7 @@
     application layer, namely, in this case, RPCSEC_GSS.
   </t>
   <t>
-    The motivation for RPCSEC_GSSv3 is to add support for labeled security
+    A major motivation for RPCSEC_GSSv3 is to add support for labeled security
     and server-side copy for NFSv4. 
   </t>
   <t>
@@ -39,7 +39,7 @@
   <t>
     Multi-principal assertions can be used to address shared cache
     poisoning attacks on the client cache by a user. As described
-    in <xref target="ref:rxgk"> Section 7 </xref>, multi-user machines
+    in Section 7 of <xref target="ref:rxgk"/>, multi-user machines
     with a single cache manager can fetch and cache data on a users'
     behalf, and re-display it for another user from the cache without
     re-fetching the data from the server.
@@ -164,7 +164,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <section title="Compatibility with RPCSEC_GSSv2">
   <t> 
     The functionality of <xref target="RFC5403">RPCSEC_GSSv2</xref> is fully
-    supported by RPCSEC_GSSv3.
+    supported by RPCSEC_GSSv3 with the exception of the RPCSEC_GSS_BIND_CHANNEL
+    operation which is deprecated (see <xref target="bindchdep"/>).
   </t>
   </section> <!-- Compatibility with RPCSEC_GSSv2 -->
 
@@ -317,7 +318,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
   </section> <!-- New Version Number -->
 
-  <section  title="RPCSEC_GSS_BIND_CHANNEL Operation Deprecated">
+  <section anchor="bindchdep" title="RPCSEC_GSS_BIND_CHANNEL Operation Deprecated">
     <t>
       RPCSEC_GSSv3 provides a channel binding assertion that replaces
       the RPCSEC_GSSv2 RPCSEC_GSS_BIND_CHANNEL operation.
@@ -495,24 +496,26 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           RPCSEC_GSSv3 clients MAY assert a multi-principal authentication of
-          the client host principal and a user principal.
-          This feature is needed, for example, when an RPC client wishes to use
-          authority assertions that the server may only grant if a user and an
-          RPC client are authenticated together to the server.  Thus a server
+          the RPC client host principal and a user principal.
+          This feature is needed, for example, when an RPC client host
+          wishes to use authority assertions that the server may only
+          grant if a user and an RPC client host
+          are authenticated together to the server.  Thus a server
           may refuse to grant requested authority to a user acting alone
           (e.g., via an unprivileged user-space program), or to an RPC client
-          acting alone (e.g. when an RPC client is acting on behalf of a user)
-          but may grant requested authority to an RPC client acting on behalf
-          of a user if the server identifies the user and trusts the RPC client.
+          host acting alone (e.g. when an RPC client host is acting on behalf of
+          a user) but may grant requested authority to an RPC client host
+          acting on behalf of a user if the server identifies the user
+          and trusts the RPC client host.
         </t>
         <t>
           It is assumed that an unprivileged user-space program would not have
           access to RPC client host credentials needed to establish a GSS-API
-          security context authenticating the RPC client to the server,
+          security context authenticating the RPC client host to the server,
           therefore
           an unprivileged user-space program could not create an RPCSEC_GSSv3
-          RPCSEC_GSS_CREATE message that successfully binds an RPC client and a
-          user security context.
+          RPCSEC_GSS_CREATE message that successfully binds an RPC client host
+          and a user security context.
         </t>
         <t>
           In addition to the <xref target="sec:protocol">parent handle</xref>,
@@ -524,7 +527,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           GSS-API security context that authenticates the RPC client host for
           the parent handle. The inner context handle it SHOULD use a context
           handle to authenticate a user.  The reverse (parent handle
-          authenticates user, inner authenticates an RPC client) MUST NOT
+          authenticates user, inner authenticates an RPC client host) MUST NOT
           be used.
           Other multi-principal parent and inner context handle uses might
           eventually make sense, but would need to be introduced in a new
