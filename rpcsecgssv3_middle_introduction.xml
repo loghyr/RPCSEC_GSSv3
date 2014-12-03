@@ -405,14 +405,14 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///  struct rgss3_create_args {
    ///          rgss3_gss_mp_auth    *rca_mp_auth;
    ///          rgss3_chan_binding   *rca_chan_bind_mic;
-   ///          rgss3_assertion      rca_assertions<>;
+   ///          rgss3_assertion_u     rca_assertions<>;
    ///  };
    ///
    ///  struct rgss3_create_res {
    ///          opaque               rcr_handle<>;
    ///          rgss3_gss_mp_auth    *rcr_mp_auth;
    ///          rgss3_chan_binding   *rcr_chan_bind_mic;
-   ///          rgss3_assertion      rcr_assertions<>;
+   ///          rgss3_assertion_u     rcr_assertions<>;
    ///  };
    ///
    ///  enum rgss3_assertion_type {
@@ -428,10 +428,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
    ///          rgss3_privs  rau_privs;
    ///  default:
    ///          opaque       rau_ext<>;
-   ///  };
-   ///
-   ///  struct rgss3_assertion {
-   ///          rgss3_assertion_u    ra_assertion;
    ///  };
    ///
         ]]></artwork>
