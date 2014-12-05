@@ -382,10 +382,6 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       RPCSEC_GSS_CREATE or RPCSEC_GSS_LIST control message:
       <list style='symbols'>
         <t>
-          rpc_gss_svc_channel_prot (see
-          <xref target="RFC5403">RPCSEC_GSSv2</xref>) 
-        </t>
-        <t>
           rpc_gss_svc_integrity
         </t>
         <t>
@@ -395,6 +391,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
     <t>
       Specifically the client MUST NOT use rpc_gss_svc_none.
+    </t>
+    <t>
+      RPCSEC_GSS_LIST can also use rpc_gss_svc_channel_prot (see
+      <xref target="RFC5403">RPCSEC_GSSv2</xref>) if the request is sent
+      using an RPCSEC_GSSv3 child handle with channel bindings enabled
+      as described in <xref target="ss:cb"/>.
     </t>
 
     <section title="New Control Procedure - RPCSEC_GSS_CREATE">
@@ -683,7 +685,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           </list>
         </t>
         <t>
-          Any RPCSEC_GSSv3 context handle that has been bound to a secure
+          Any RPCSEC_GSSv3 child context handle that has been bound to a secure
           channel in this way SHOULD be used only with the
           rpc_gss_svc_channel_prot, and SHOULD NOT be used with
           rpc_gss_svc_none nor rpc_gss_svc_integrity -- if the secure channel
