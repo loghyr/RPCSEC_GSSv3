@@ -186,12 +186,13 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
 </section> <!-- Version Negotiation -->
 
-  <section anchor="ss:nrv" title="New REPLY verifier">
+  <section anchor="ss:nrv" title="New REPLY Verifier">
   <t> 
+    A new reply verifier is needed for RPCSEC_GSSv3 due to the following:
     The RPCSEC_GSSv3 child handle uses the same GSS context as the parent
-    handle. Since a child and parent RPCSEC_GSSv3 handle could have the same
-    RPCSEC_GSS sequence numbers, and the verifier of RPCSEC_GSS replies
-    computes a MIC on just the sequence number, this provides
+    handle, so a child and parent RPCSEC_GSSv3 handle could have the same
+    RPCSEC_GSS sequence numbers. Since the reply verifier of previous versions of
+    RPCSEC_GSS computes a MIC on just the sequence number, this provides
     opportunities for man in the middle attacks.
   </t>
   <t>
@@ -212,7 +213,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       </artwork>
     </figure>
   </t>
-  </section> <!-- New REPLY verifier -->
+  </section> <!-- New REPLY Verifier -->
   <section title="New Version Number">
     <t>
       &lt;CODE BEGINS&gt;
