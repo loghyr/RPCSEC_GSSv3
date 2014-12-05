@@ -456,7 +456,10 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           </t>
         </list>
         The reply to this message consists of either an error or an
-        rgss3_create_res structure.
+        rgss3_create_res structure. As noted in <xref target="ss:la"/> and
+        <xref target="ss:pa"/> successful rgss3_assertions are
+        enumerated in rcr_assertions, and are REQUIRED be enumerated in the
+        same order as they appeared in the rca_assertions argument.
       </t>
       <t>
         Upon successful RPCSEC_GSS_CREATE, both the client and the server
