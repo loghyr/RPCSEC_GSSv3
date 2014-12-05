@@ -939,15 +939,4 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     protect any callbacks relating to server state initiated by RPCs
     protected by RPCSEC_GSSv3 contexts.
   </t>
-  <t>
-    <cref anchor='AI6' source='NW'>
-      [Add text about interaction with GSS-SSV...]
-    </cref>
-  </t>
-  <t>
-    <cref anchor='AI7' source='AA'>
-      AFAICS the reason to use SSV is to avoid using a client machine credential
-      which means multi-principal authentication can not be used.
-    </cref>
-  </t>
 </section> <!-- Security Considerations -->
