@@ -125,12 +125,12 @@
         <title>NFS Version 4 Minor Version 2</title>
 
         <author initials='T' surname='Haynes' fullname='Thomas Haynes'>
-          <organization abbrev='NetApp' />
+          <organization abbrev='Primary Data' />
         </author>
 
-        <date month='June' year='2014' />
+        <date month='December' year='2014' />
       </front>
-      <seriesInfo name="draft-ietf-nfsv4-minorversion2-27" value="(Work In Progress)"/>
+      <seriesInfo name="draft-ietf-nfsv4-minorversion2-29" value="(Work In Progress)"/>
     </reference>
 
     <reference anchor='RFC5661'>
