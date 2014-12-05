@@ -150,6 +150,27 @@
       <seriesInfo name="draft-ietf-nfsv4-minorversion2-27" value="(Work In Progress)"/>
     </reference>
 
+    <reference anchor='RFC5661'>
+      <front>
+        <title>Network File System (NFS) Version 4 Minor Version 1 Protocol</title>
+
+        <author initials='S' surname='Shepler' fullname='Spencer Shepler'>
+          <organization abbrev='Storspeed, Inc.' />
+        </author>
+
+        <author initials='M' surname='Eisler' fullname='Mike Eisler'>
+          <organization abbrev='NetApp' />
+        </author>
+
+        <author initials='D' surname='Noveck' fullname='David Noveck'>
+          <organization abbrev='NetApp' />
+        </author>
+
+        <date month='January' year='2010' />
+      </front>
+      <seriesInfo name="RFC" value="5661" />
+      <format type="TXT" target="ftp://ftp.isi.edu/in-notes/rfc5661.txt"/>
+    </reference>
 
   <reference anchor='RFC5056'>
     <front>

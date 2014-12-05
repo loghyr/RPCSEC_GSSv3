@@ -924,7 +924,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   </t>
   <t>
     There may be interactions with NFSv4's callback security scheme and
-    NFSv4.1's GSS-API "SSV" mechanisms.  Specifically, the NFSv4 callback
+    <xref target="RFC5661"> NFSv4.1's </xref> GSS-API "SSV" mechanisms.
+    Specifically, the NFSv4 callback
     scheme requires that the server initiate GSS-API security contexts,
     which does not work well in practice, and in the context of client-
     side processes running as the same user but with different privileges
@@ -939,4 +940,18 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     protect any callbacks relating to server state initiated by RPCs
     protected by RPCSEC_GSSv3 contexts.
   </t>
+
+  <t>
+    As described in <xref target="RFC5661"> Section 2.10.10 </xref>
+    the client is permitted to associate multiple RPCSEC_GSS handles
+    with a single SSV GSS context. RPCSEC_GSSv3 handles will work well
+    with SSV in that the man-in-the-middle attacks described in
+    <xref target="RFC5661"> Section 2.10.10 </xref> are solved by
+    the <xref target="ss:nrv"> new reply verifier </xref>. Using
+    an RPCSEC_GSSv3 handle backed by a GSS-SSV mechanism context as
+    a parent handle in an RPCSEC_GSS_CREATE call while permitted
+    is complicated by the lifetime rules of SSV contexts and their
+    associated RPCSEC_GSS handles.
+  </t>
+
 </section> <!-- Security Considerations -->
