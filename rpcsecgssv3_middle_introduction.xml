@@ -24,7 +24,8 @@
     Labeled NFS (see Section 8 of <xref target='ref:nfsv4.2' />) uses
     the subject label provided by the client via the RPCSEC_GSSv3 layer to
     enforce MAC access to objects owned by the server to enable server 
-    guest mode or full mode labeled NFS.
+    guest mode. RPCSEC_GSSv3 label assertions provide the means to achieve
+    full mode labeled NFS.
   </t>
   <t>
     A traditional inter-server file copy entails the user gaining access to
@@ -330,7 +331,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     <t>
       RPCSEC_GSSv3 requires the addition of several values to the auth_stat
       enumerated type definition. The use of each of these new auth_stat
-      values is explained later in this document.
+      values is explained throughout this document.
     </t>
 
     <figure>
@@ -582,7 +583,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
           a context corresponding to the inner context handle. When the server
           does not have a context handle corresponding to the inner
           context handle of a multi-pricipal authorization request, the server
-          send a reply status of MSG_DENIED with the reject_stat of AUTH_ERROR
+          sends a reply status of MSG_DENIED with the reject_stat of AUTH_ERROR
           and with an auth_stat value of RPCSEC_GSS_INNER_CREDPROBLEM.
         </t>
         <t>
