@@ -145,9 +145,9 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     RPCSEC_GSSv3 is patterned as follows:
     <list style='symbols'>
       <t> 
-        A client uses an existing RPCSEC_GSSv3 context
-        handle to protect RPCSEC_GSSv3 exchanges, this will be termed the
-        "parent" handle.
+        A client uses an existing RPCSEC_GSSv3 context handle established in the
+        usual manner (See Section 5.2 <xref target="RFC2203" />) to protect
+        RPCSEC_GSSv3 exchanges, this will be termed the "parent" handle.
       </t> 
       <t> 
         The server issues a "child" RPCSEC_GSSv3 handle in the
