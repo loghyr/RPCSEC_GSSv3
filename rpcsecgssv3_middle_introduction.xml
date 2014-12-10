@@ -17,12 +17,19 @@
     application layer, namely, in this case, RPCSEC_GSS.
   </t>
   <t>
-    A major motivation for RPCSEC_GSSv3 is to add support for labeled security
-    and server-side copy for NFSv4. 
+    A major motivation for RPCSEC_GSSv3 is to add support for multi-level
+    (labeled) security and server-side copy for NFSv4. 
+  </t>
+  <t>
+    Multi-Level Security (MLS) is a traditional model where subjects are
+    given a security level (Unclassified, Secret, Top Secret, etc.)
+    and objects are given security labels that mandate the access of
+    the subject to the object (see <xref target='BL73' /> and
+    <xref target='RFC2401' />).
   </t>
   <t>
     Labeled NFS (see Section 8 of <xref target='ref:nfsv4.2' />) uses
-    the subject label provided by the client via the RPCSEC_GSSv3 layer to
+    the MLS subject label provided by the client via the RPCSEC_GSSv3 layer to
     enforce MAC access to objects owned by the server to enable server 
     guest mode. RPCSEC_GSSv3 label assertions provide the means to achieve
     full mode labeled NFS.
@@ -63,10 +70,11 @@
   <t>
     <list style="symbols">
       <t>
-        Security labels for multi-level, type enforcement, and other
-        labeled security models. See <xref target='ref:rh_mls' />,
-        <xref target='DTOS' />, <xref target='SENFSV3' />,
-        <xref target='ref:nfsv4.2' /> and <xref target='RFC7204' />.
+        Security labels for multi-level security (See
+        <xref target='BL73' />, <xref target='RFC2401' />)
+        type enforcement, and other labeled
+        security models (See <xref target='ref:nfsv4.2' /> and
+        <xref target='RFC7204' />).
       </t>
       <t>
         Application-specific structured privileges. For an example
@@ -84,12 +92,11 @@
   <t>
     Assertions of labels and privileges are evaluated by the
     server, which may then map the asserted values to other values, all
-    according to server-side policy.
+    according to server-side policy. See <xref target="ref:nfsv4.2"/>.
   </t>
   <t>
     We add an option for enumerating server supported label format specifiers
-    (LFS).  The LFS and Label Format Registry are described in detail
-    in <xref target='ref:lfsreg' />.
+    (LFS). See <xref target='RFC7204' /> for detail.
   </t>
   <t>
     This document contains the  External Data Representation (XDR)

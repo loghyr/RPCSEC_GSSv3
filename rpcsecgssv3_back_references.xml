@@ -233,75 +233,44 @@
 
 <references title="Informative References">
 
-  <reference anchor='ref:rh_mls'>
-    <front>
-      <title>
-        Section 46.6. Multi-Level Security (MLS) of Deployment Guide:
-        Deployment, configuration and administration of Red Hat Enterprise
-        Linux 5, Edition 6
-      </title>
-      <author />
-      <date year='2011' />
-    </front>
-    <format type='HTML' target='http://docs.redhat.com/docs/en-US/Red_Hat_Enterprise_Linux/5/html/Deployment_Guide/sec-mls-ov.html' />
-  </reference>
+    <reference anchor="BL73">
+      <front>
+        <title>
+          Secure Computer Systems: Mathematical Foundations and Model
+        </title>
+          <author initials='D.E.' surname='Bell' fullname='D.E. Bell'> <organization /></author>
+          <author initials='L.J.' surname='LaPadula' fullname='L.J. LaPadula'> <organization /></author>
+        <date year='1973' month='May' />
+      </front>
+      <seriesInfo name='Technical Report M74-244,' value='The MITRE Corporation Bedford, MA' />
+    </reference>
 
-<reference anchor='DTOS'
-target='http://www.cs.utah.edu/flux/fluke/html/dtos/HTML/dtos.html'>
-  <front>
-    <title abbrev='DTOS'>
-      The Distributed Trusted Operating System (DTOS) Home Page
-    </title>
-    <author initials='S.' surname='Smalley' fullname='Stephen Smalley'>
-      <organization>
-      National Security Agency
-      </organization>
-    </author>
-    <date year='2000' />
-  </front>
-</reference>
+    <reference anchor="RFC2401">
+      <front>
+        <title>
+          Security Architecture for the Internet Protocol
+        </title>
+        <author initials='S.' surname='Kent' fullname='S. Kent'>
+        </author>
+        <author initials='R.' surname='Atkinson' fullname='R. Atkinson'>
+        </author>
+        <date year='1998' month='November' />
+      </front>
+      <seriesInfo name='RFC' value='2401' />
+      <format type='TXT' octets='50937' target='ftp://ftp.isi.edu/in-notes/rfc2401.txt' />
+    </reference>
 
- <reference anchor='SENFSV3' target='http://www.nsa.gov/research/_files/selinux/papers/nfsv3.pdf'>
+  <reference anchor="ref:rxgk">
     <front>
-      <title abbrev='SENFSv3'>Implementing SELinux Support for NFS</title>
-      <author initials="J.W." surname="Carter" fullname="James W. Carter">
-        <organization abbrev="NSA">
-        National Security Agency
-        </organization>
-        <address>
-          <postal>
-            <street>9800 Savage Rd.</street>
-            <street>Suite 6534</street>
-            <city>Ft. Meade</city>
-            <region>MD</region>
-            <code>20755-6534</code>
-          </postal>
-          <email>jwcart2@tycho.nsa.gov</email>
-        </address>
-      </author>
-      <date year='2005' />
+      <title>Integrating rxgk with AFS</title>
+      <author initials="S." surname="Wilkinson" />
+      <author initials="B." surname="Kaduk" />
+      <date year='2014' month='April' />
     </front>
+    <seriesInfo name="draft-wilkinson-afs3-rxgk-afs" value="(work in progress)"/>
   </reference>
 
 
-    <reference anchor="ref:lfsreg">
-      <front>
-        <title>Registry Specification for MAC Security Label Formats</title>
-        <author initials="D." surname="Quigley" />
-        <author initials="J." surname="Lu" />
-        <date year="2011" />
-      </front>
-      <seriesInfo name="draft-quigley-label-format-registry" value="(work in progress)"/>
-    </reference>
 
-    <reference anchor="ref:rxgk">
-      <front>
-        <title>Integrating rxgk with AFS</title>
-        <author initials="S." surname="Wilkinson" />
-        <author initials="B." surname="Kaduk" />
-        <date year='2014' month='April' />
-      </front>
-      <seriesInfo name="draft-wilkinson-afs3-rxgk-afs" value="(work in progress)"/>
-    </reference>
 </references>
 
