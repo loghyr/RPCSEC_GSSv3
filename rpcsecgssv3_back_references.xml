@@ -120,7 +120,7 @@
 	      target='ftp://ftp.isi.edu/in-notes/rfc2743.txt' />
     </reference>
 
-    <reference anchor='ref:nfsv4.2'>
+    <reference anchor='NFSv4.2'>
       <front>
         <title>NFS Version 4 Minor Version 2</title>
 
@@ -260,7 +260,7 @@
       <format type='TXT' octets='50937' target='ftp://ftp.isi.edu/in-notes/rfc2401.txt' />
     </reference>
 
-  <reference anchor="ref:rxgk">
+  <reference anchor="AFS-RXGK">
     <front>
       <title>Integrating rxgk with AFS</title>
       <author initials="S." surname="Wilkinson" />

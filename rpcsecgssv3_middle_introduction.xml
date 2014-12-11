@@ -28,7 +28,7 @@
     <xref target='RFC2401' />).
   </t>
   <t>
-    Labeled NFS (see Section 8 of <xref target='ref:nfsv4.2' />) uses
+    Labeled NFS (see Section 8 of <xref target='NFSv4.2' />) uses
     the MLS subject label provided by the client via the RPCSEC_GSSv3 layer to
     enforce MAC access to objects owned by the server to enable server 
     guest mode. RPCSEC_GSSv3 label assertions provide the means to achieve
@@ -38,7 +38,7 @@
     A traditional inter-server file copy entails the user gaining access to
     a file on the source, reading it, and writing it to a file on
     the destination.  In secure NFSv4 inter-server server-side copy
-    (see Section 3.4.1 of <xref target='ref:nfsv4.2' />),
+    (see Section 3.4.1 of <xref target='NFSv4.2' />),
     the user first secures access to both source and destination files,
     and then uses NFSv4.2 defined RPCSEC_GSSv3 structured
     privileges to authorize the destination to copy the file from the
@@ -47,7 +47,7 @@
   <t>
     Multi-principal assertions can be used to address shared cache
     poisoning attacks on the client cache by a user. As described
-    in Section 7 of <xref target="ref:rxgk"/>, multi-user machines
+    in Section 7 of <xref target="AFS-RXGK"/>, multi-user machines
     with a single cache manager can fetch and cache data on a users'
     behalf, and re-display it for another user from the cache without
     re-fetching the data from the server.
@@ -73,12 +73,12 @@
         Security labels for multi-level security (See
         <xref target='BL73' />, <xref target='RFC2401' />)
         type enforcement, and other labeled
-        security models (See <xref target='ref:nfsv4.2' /> and
+        security models (See <xref target='NFSv4.2' /> and
         <xref target='RFC7204' />).
       </t>
       <t>
         Application-specific structured privileges. For an example
-        see server-side copy <xref target='ref:nfsv4.2' />.
+        see server-side copy <xref target='NFSv4.2' />.
       </t>
       <t>
         Multi-principal authentication of the client host and user to the server
@@ -92,7 +92,7 @@
   <t>
     Assertions of labels and privileges are evaluated by the
     server, which may then map the asserted values to other values, all
-    according to server-side policy. See <xref target="ref:nfsv4.2"/>.
+    according to server-side policy. See <xref target="NFSv4.2"/>.
   </t>
   <t>
     We add an option for enumerating server supported label format specifiers
@@ -737,7 +737,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           Label encoding is specified to mirror the NFSv4.2 sec_label attribute
-          described in Section 12.2.2 of <xref target='ref:nfsv4.2' />. The 
+          described in Section 12.2.2 of <xref target='NFSv4.2' />. The 
           label format specifier (LFS) is an identifier used by the client to
           establish the syntactic format of the security label and the
           semantic meaning of its components. The policy identifier (PI) is
@@ -823,7 +823,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
         </t>
         <t>
           Section 3.4.1.2. "Inter-Server Copy with RPCSEC_GSSv3"
-          of <xref target='ref:nfsv4.2' /> shows an example of structured
+          of <xref target='NFSv4.2' /> shows an example of structured
           privilege definition and use.
         </t>
       </section> <!-- Structured Privilege Assertions -->
