@@ -62,83 +62,90 @@
     less) privilege than the user normally would be accorded. 
   </t>
 
-  <t>
-    We therefore describe RPCSEC_GSS version 3 (RPCSEC_GSSv3). RPCSEC_GSSv3
-    is the same as <xref target="RFC5403">RPCSEC_GSSv2</xref>, except that
-    the following assertions of authority have been added.
-  </t>
-  <t>
-    <list style="symbols">
-      <t>
-        Security labels for multi-level security (See
-        <xref target='BL73' />, <xref target='RFC2401' />)
-        type enforcement, and other labeled
-        security models (See <xref target='NFSv4.2' /> and
-        <xref target='RFC7204' />).
-      </t>
-      <t>
-        Application-specific structured privileges. For an example
-        see server-side copy <xref target='NFSv4.2' />.
-      </t>
-      <t>
-        Multi-principal authentication of the client host and user to the server
-        done by binding two RPCSEC_GSS handles.
-      </t>
-      <t>
-        Simplified channel binding.
-      </t>
-    </list>
-  </t>
-  <t>
-    Assertions of labels and privileges are evaluated by the
-    server, which may then map the asserted values to other values, all
-    according to server-side policy. See <xref target="NFSv4.2"/>.
-  </t>
-  <t>
-    An option for enumerating server supported label format specifiers
-    (LFS) is provided. See <xref target='RFC7204' /> for detail.
-  </t>
-  <t>
-    This document contains the  External Data Representation (XDR)
-    (<xref target="RFC4506" />) definitions for the RPCSEC_GSSv3 protocol.
-    The XDR description is provided in this document in a way
-    that makes it simple for the reader to extract into ready
-    to compile form. The reader can feed this document in the
-    following shell script to produce the machine readable XDR
-    description of RPCSEC_GSSv3:
-  </t>
-  <t>
-    &lt;CODE BEGINS&gt;
-  </t>
-  <figure>
-    <artwork>
+
+  <section title="Added Functionality">
+    <t>
+      We therefore describe RPCSEC_GSS version 3 (RPCSEC_GSSv3). RPCSEC_GSSv3
+      is the same as <xref target="RFC5403">RPCSEC_GSSv2</xref>, except that
+      the following assertions of authority have been added.
+    </t>
+    <t>
+      <list style="symbols">
+        <t>
+          Security labels for multi-level security (See
+          <xref target='BL73' />, <xref target='RFC2401' />)
+          type enforcement, and other labeled
+          security models (See <xref target='NFSv4.2' /> and
+          <xref target='RFC7204' />).
+        </t>
+        <t>
+          Application-specific structured privileges. For an example
+          see server-side copy <xref target='NFSv4.2' />.
+        </t>
+        <t>
+          Multi-principal authentication of the client host and user to the
+          server done by binding two RPCSEC_GSS handles.
+        </t>
+        <t>
+          Simplified channel binding.
+        </t>
+      </list>
+    </t>
+    <t>
+      Assertions of labels and privileges are evaluated by the
+      server, which may then map the asserted values to other values, all
+      according to server-side policy. See <xref target="NFSv4.2"/>.
+    </t>
+    <t>
+      An option for enumerating server supported label format specifiers
+      (LFS) is provided. See <xref target='RFC7204' /> for detail.
+    </t>
+  </section> <!-- Added Functionality -->
+
+  <section title="XDR Code Extraction">
+    <t>
+      This document contains the  External Data Representation (XDR)
+      (<xref target="RFC4506" />) definitions for the RPCSEC_GSSv3 protocol.
+      The XDR description is provided in this document in a way
+      that makes it simple for the reader to extract into ready
+      to compile form. The reader can feed this document in the
+      following shell script to produce the machine readable XDR
+      description of RPCSEC_GSSv3:
+    </t>
+    <t>
+      &lt;CODE BEGINS&gt;
+    </t>
+    <figure>
+      <artwork>
 #!/bin/sh
 grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </artwork>
-  </figure>
-  <t>
-    &lt;CODE ENDS&gt;
-  </t>
-  <t>
-    I.e. if the above script is stored in a file called "extract.sh",
-    and this document
-    is in a file called "spec.txt", then the reader can do:
-  </t>
-  <t>
-    &lt;CODE BEGINS&gt;
-  </t>
-  <figure>
-    <artwork><![CDATA[
+    </figure>
+    <t>
+      &lt;CODE ENDS&gt;
+    </t>
+    <t>
+      I.e. if the above script is stored in a file called "extract.sh",
+      and this document
+      is in a file called "spec.txt", then the reader can do:
+    </t>
+    <t>
+      &lt;CODE BEGINS&gt;
+    </t>
+    <figure>
+      <artwork><![CDATA[
  sh extract.sh < spec.txt > rpcsec_gss_v3.x
-    ]]></artwork>
-  </figure>
-  <t>
-    &lt;CODE ENDS&gt;
-  </t>
-  <t>
-    The effect of the script is to remove leading white space
-    from each line, plus a sentinel sequence of "///".
-  </t>
+      ]]></artwork>
+    </figure>
+    <t>
+      &lt;CODE ENDS&gt;
+    </t>
+    <t>
+      The effect of the script is to remove leading white space
+      from each line, plus a sentinel sequence of "///".
+    </t>
+  </section> <!-- XDR Code Extraction -->
+
 </section> <!-- Introduction and Motivation -->
 
 <section anchor="sec:protocol" title="The RPCSEC_GSSv3 Protocol">
