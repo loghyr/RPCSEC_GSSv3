@@ -10,11 +10,11 @@
     for channel bindings <xref target="RFC5056" />.
   </t>
   <t>
-    We find that GSS-API mechanisms are insufficient for communicating
+    Existing GSS-API mechanisms are insufficient for communicating
     certain aspects of authority to a server.
     The GSS-API and its mechanisms certainly could be extended to address
-    this shortcoming, but it seems be far simpler to address it at the
-    application layer, namely, in this case, RPCSEC_GSS.
+    this shortcoming. However, here it is addressed at the
+    application layer, i.e. in RPCSEC_GSS.
   </t>
   <t>
     A major motivation for RPCSEC_GSSv3 is to add support for multi-level
@@ -95,8 +95,8 @@
     according to server-side policy. See <xref target="NFSv4.2"/>.
   </t>
   <t>
-    We add an option for enumerating server supported label format specifiers
-    (LFS). See <xref target='RFC7204' /> for detail.
+    An option for enumerating server supported label format specifiers
+    (LFS) is provided. See <xref target='RFC7204' /> for detail.
   </t>
   <t>
     This document contains the  External Data Representation (XDR)
@@ -143,13 +143,17 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
 <section anchor="sec:protocol" title="The RPCSEC_GSSv3 Protocol">
   <t>
-    RPCSEC_GSSv3 is the same as <xref target="RFC5403">RPCSEC_GSSv2</xref>,
-    except that support for assertions has been added.
-    The entire RPCSEC_GSSv3 protocol is not presented. Instead the differences
-    between RPCSEC_GSSv3 and RPCSEC_GSSv2 are shown.
+    RPCSEC_GSS version 3 (RPCSEC_GSSv3) is very similar to
+    <xref target="RFC5403"> RPCSEC_GSS version 2 (RPCSEC_GSSv2)</xref>.
+    The differences are the addition of support for assertions and
+    channel bindings are supported via a different mechanism.
   </t>
   <t>
-    RPCSEC_GSSv3 is patterned as follows:
+    The entire RPCSEC_GSSv3 protocol is not presented here. Only the differences
+    between it and RPCSEC_GSSv2 are shown.
+  </t>
+  <t>
+    The use of RPCSEC_GSSv3 is structured as follows:
     <list style='symbols'>
       <t> 
         A client uses an existing RPCSEC_GSSv3 context handle established in the
@@ -195,17 +199,18 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
 
   <section anchor="ss:nrv" title="New REPLY Verifier">
   <t> 
-    A new reply verifier is needed for RPCSEC_GSSv3 due to the following:
-    The RPCSEC_GSSv3 child handle uses the same GSS context as the parent
-    handle, so a child and parent RPCSEC_GSSv3 handle could have the same
-    RPCSEC_GSS sequence numbers. Since the reply verifier of previous versions of
-    RPCSEC_GSS computes a MIC on just the sequence number, this provides
-    opportunities for man in the middle attacks.
+    A new reply verifier is needed for RPCSEC_GSSv3 because of a situation that
+    arises from the use of the same GSS context by child and parent handles.
+    Because the RPCSEC_GSSv3 child handle uses the same GSS context as the
+    parent handle, a child and parent RPCSEC_GSSv3 handle could have the same
+    RPCSEC_GSS sequence numbers. Since the reply verifier of previous
+    versions of RPCSEC_GSS computes a MIC on just the sequence number,
+    this provides opportunities for man in the middle attacks.
   </t>
   <t>
-    This is easily addressed: RPCSEC_GSS version 3 changes the verifier of
-    the reply to compute the verifier using the exact same input as that is
-    used for verifier of the request, except for the mtype change from CALL
+    This issue is addressed in RPCSEC_GSS version 3 by computing
+    the verifier using the exact same input as is used to compute the
+    request verifier, except for the mtype is changed from CALL
     to REPLY. The new reply verifier computes a MIC over the following RPC
     reply header data:
     <figure>
@@ -221,7 +226,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </figure>
   </t>
   </section> <!-- New REPLY Verifier -->
-  <section title="New Version Number">
+  <section title="XDR Code Preliminaries">
     <t>
       &lt;CODE BEGINS&gt;
     </t>
@@ -325,7 +330,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
       to 3 indicates that the initiator and target support the new RPCSEC_GSSv3
       control procedures.
     </t>
-  </section> <!-- New Version Number -->
+  </section> <!-- XDR Code Preliminaries -->
 
   <section anchor="bindchdep" title="RPCSEC_GSS_BIND_CHANNEL Operation Deprecated">
     <t>
@@ -338,7 +343,7 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
   <section anchor="ss:nasv" title="New auth_stat Values">
     <t>
       RPCSEC_GSSv3 requires the addition of several values to the auth_stat
-      enumerated type definition. The use of each of these new auth_stat
+      enumerated type definition. The use of these new auth_stat
       values is explained throughout this document.
     </t>
 
@@ -633,8 +638,8 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
              RPC security flavor for establishing context handles,
             </t>
             <t>
-              channel bindings data are not hashed because the
-              community now agrees that it is the secure channel's
+              channel bindings data are not hashed because there is now
+              general agreement that it is the secure channel's
               responsibility to produce channel bindings data of
               manageable size.
             </t>
