@@ -339,10 +339,12 @@ grep "^  *///" | sed 's?^  */// ??' | sed 's?^  *///$??'
     </t>
   </section> <!-- XDR Code Preliminaries -->
 
-  <section anchor="bindchdep" title="RPCSEC_GSS_BIND_CHANNEL Operation Deprecated">
+  <section anchor="bindchdep" title="RPCSEC_GSS_BIND_CHANNEL Operation">
     <t>
       RPCSEC_GSSv3 provides a channel binding assertion that replaces
       the RPCSEC_GSSv2 RPCSEC_GSS_BIND_CHANNEL operation.
+    </t>
+    <t>
       RPCSEC_GSS_BIND_CHANNEL MUST NOT be used on RPCSEC_GSS version 3 handles.
     </t>
   </section> <!-- RPCSEC_GSS_BIND_CHANNEL Deprecated -->
